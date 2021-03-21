@@ -17,7 +17,8 @@ fun main() {
                 gameName = "Showcase game",
                 debug = false,
                 canvas = canvas as HTMLCanvasElement,
-                gameScreenConfiguration = GameScreenConfiguration.WithRatio(16f / 9f)
+                gameScreenConfiguration = GameScreenConfiguration.WithRatio(16f / 9f),
+                rootPath = "/js/distributions/"
             )
         },
         gameFactory = {
