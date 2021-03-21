@@ -8,6 +8,6 @@ group = "com.github.minigdx"
 version = "1.0-SNAPSHOT"
 
 minigdx {
-    jvm.mainClass.set("demo.MainKt")
+    jvm.mainClass.set("showcase.Main")
     version.set("DEV-SNAPSHOT")
 }
