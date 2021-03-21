@@ -22,3 +22,5 @@ collections:
 
 plugins:
   - jekyll-paginate
+
+exclude: ['build', '.gradle', '_site',]
