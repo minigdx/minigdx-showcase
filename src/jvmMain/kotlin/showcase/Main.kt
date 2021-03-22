@@ -21,7 +21,7 @@ class Main {
                         "MiniGDX Showcase",
                         gameScreenConfiguration = GameScreenConfiguration.WithRatio(16f/9f),
                         debug = false,
-                        window = Window(1024, (1024 * 9f/16f).toInt(), "migdx")
+                        window = Window(1024, (1024 * 9f/16f).toInt(), "minigdx")
                     )
 
                 }

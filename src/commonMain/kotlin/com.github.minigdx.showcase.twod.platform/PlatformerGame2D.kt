@@ -15,10 +15,12 @@ import com.github.dwursteisen.minigdx.ecs.components.Component
 import com.github.dwursteisen.minigdx.ecs.components.Position
 import com.github.dwursteisen.minigdx.ecs.components.SpriteComponent
 import com.github.dwursteisen.minigdx.ecs.components.StateMachineComponent
+import com.github.dwursteisen.minigdx.ecs.components.gl.BoundingBox
 import com.github.dwursteisen.minigdx.ecs.components.gl.MeshPrimitive
 import com.github.dwursteisen.minigdx.ecs.entities.Entity
 import com.github.dwursteisen.minigdx.ecs.entities.EntityFactory
 import com.github.dwursteisen.minigdx.ecs.entities.position
+import com.github.dwursteisen.minigdx.ecs.physics.AABBCollisionResolver
 import com.github.dwursteisen.minigdx.ecs.states.State
 import com.github.dwursteisen.minigdx.ecs.systems.EntityQuery
 import com.github.dwursteisen.minigdx.ecs.systems.StateMachineSystem
@@ -33,8 +35,20 @@ class Coin : Component
 
 class CoinSystem : System(EntityQuery(Coin::class)) {
 
+    private val collider = AABBCollisionResolver()
+
+    private val player by interested(EntityQuery(Player::class))
+
     override fun update(delta: Seconds, entity: Entity) {
         entity.get(Position::class).addLocalRotation(y = 90f, delta = delta)
+        if(entity.hasComponent(BoundingBox::class) && collider.collide(
+                entity,
+                entity.position.globalTransformation,
+                player.first()
+            )) {
+            // TODO: play a sound?
+            entity.destroy()
+        }
     }
 }
 
@@ -134,12 +148,20 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
                 val translation = it.transformation.toMat4().translation
                 player.position.setGlobalTranslation(translation.x, translation.y, 1f)
                 player.add(Player())
+                // bounding box
+                it.children.firstOrNull()?.run {
+                    player.add(BoundingBox.from(this.transformation.toMat4()))
+                }
             } else if (it.name.startsWith("coin")) {
                 val player = entityFactory.engine.createSprite(spr.sprites.values.first(), spr)
                 player.get(SpriteComponent::class).switchToAnimation("coin")
                 val translation = it.transformation.toMat4().translation
                 player.position.setGlobalTranslation(translation.x, translation.y, 1f)
                 player.add(Coin())
+                // bounding box
+                it.children.firstOrNull()?.run {
+                    player.add(BoundingBox.from(this.transformation.toMat4()))
+                }
             } else {
                 entityFactory.createFromNode(it, scene)
             }
