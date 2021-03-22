@@ -7,10 +7,16 @@ import com.github.minigdx.showcase.treed.platform.PlatformerGame3D
 import com.github.minigdx.showcase.twod.platform.PlatformerGame2D
 import kotlinx.browser.document
 import org.w3c.dom.HTMLCanvasElement
+import org.w3c.dom.asList
 import org.w3c.dom.get
 
 fun main() {
     val canvas = document.getElementsByTagName("canvas")[0]!!
+    val root = document.getElementsByTagName("script").asList()
+        .first { it.hasAttribute("src") && it.getAttribute("src")?.contains("minigdx") == true }
+        .getAttribute("src")!!
+        .replace("minigdx-showcase.js", "")
+
     GameApplicationBuilder(
         gameConfigurationFactory = {
             GameConfiguration(
@@ -18,7 +24,7 @@ fun main() {
                 debug = false,
                 canvas = canvas as HTMLCanvasElement,
                 gameScreenConfiguration = GameScreenConfiguration.WithRatio(16f / 9f),
-                rootPath = "/js/distributions/"
+                rootPath = root
             )
         },
         gameFactory = {
