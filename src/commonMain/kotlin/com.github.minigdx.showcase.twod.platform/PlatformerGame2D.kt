@@ -41,11 +41,12 @@ class CoinSystem : System(EntityQuery(Coin::class)) {
 
     override fun update(delta: Seconds, entity: Entity) {
         entity.get(Position::class).addLocalRotation(y = 90f, delta = delta)
-        if(entity.hasComponent(BoundingBox::class) && collider.collide(
+        if (entity.hasComponent(BoundingBox::class) && collider.collide(
                 entity,
                 entity.position.globalTransformation,
                 player.first()
-            )) {
+            )
+        ) {
             // TODO: play a sound?
             entity.destroy()
         }
@@ -81,11 +82,7 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             if (parent.input.isKeyPressed(Key.SPACE)) {
                 return Jump(parent)
             }
-            if (parent.input.isKeyPressed(Key.ARROW_LEFT)) {
-                entity.get(Position::class).addGlobalTranslation(x = -5f, delta = delta)
-                return null
-            } else if (parent.input.isKeyPressed(Key.ARROW_RIGHT)) {
-                entity.get(Position::class).addGlobalTranslation(x = 5f, delta = delta)
+            if (parent.move(entity, delta)) {
                 return null
             }
 
@@ -113,11 +110,7 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 entity.position.setGlobalTranslation(y = y)
                 return Idle(parent)
             }
-            if (parent.input.isKeyPressed(Key.ARROW_LEFT)) {
-                entity.get(Position::class).addGlobalTranslation(x = -5f, delta = delta)
-            } else if (parent.input.isKeyPressed(Key.ARROW_RIGHT)) {
-                entity.get(Position::class).addGlobalTranslation(x = 5f, delta = delta)
-            }
+            parent.move(entity, delta)
             entity.get(Position::class).addGlobalTranslation(y = velocity, delta = delta)
             velocity -= gravity * delta
             return null
@@ -127,6 +120,25 @@ class PlayerSystem : StateMachineSystem(Player::class) {
 
             const val JUMP_HEIGHT = 2.5f // World unit
             const val JUMP_DURATION = 0.2f // Duration of the jump
+        }
+    }
+
+    private fun move(entity: Entity, delta: Seconds): Boolean {
+        val position = entity.position
+        return if (input.isKeyPressed(Key.ARROW_LEFT)) {
+            // still in the screen limit
+            if (position.translation.x - (5f * delta) > -6.5f) {
+                position.addGlobalTranslation(x = -5f, delta = delta)
+            }
+            true
+        } else if (input.isKeyPressed(Key.ARROW_RIGHT)) {
+            // still in the screen limit
+            if (position.translation.x + (5f * delta) < 6.5f) {
+                position.addGlobalTranslation(x = 5f, delta = delta)
+            }
+            true
+        } else {
+            false
         }
     }
 
