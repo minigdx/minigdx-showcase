@@ -30,8 +30,9 @@ import com.github.dwursteisen.minigdx.game.Game
 import com.github.dwursteisen.minigdx.input.Key
 import kotlin.math.sqrt
 
-class Player : StateMachineComponent()
+class Player(var base: BoundingBox) : StateMachineComponent()
 class Coin : Component
+class Platform : Component
 
 class CoinSystem : System(EntityQuery(Coin::class)) {
 
@@ -54,6 +55,10 @@ class CoinSystem : System(EntityQuery(Coin::class)) {
 }
 
 class PlayerSystem : StateMachineSystem(Player::class) {
+
+    private val platforms by interested(EntityQuery(Platform::class))
+
+    private val collider = AABBCollisionResolver()
 
     class Idle(val parent: PlayerSystem) : State() {
 
@@ -94,24 +99,33 @@ class PlayerSystem : StateMachineSystem(Player::class) {
 
         private val gravity = JUMP_HEIGHT / (JUMP_DURATION * JUMP_DURATION)
         private var velocity = sqrt(gravity * JUMP_HEIGHT)
-        private var y = 0F
 
         override fun onEnter(entity: Entity) {
             entity.get(SpriteComponent::class).switchToAnimation("jump_up")
-            y = entity.position.translation.y
         }
 
         override fun update(delta: Seconds, entity: Entity): State? {
+            val position = entity.get(Position::class)
             if (velocity < 0f) {
                 entity.get(SpriteComponent::class).switchToAnimation("jump_down")
+
+                val platform = parent.platforms.firstOrNull {
+                    parent.collider.collide(
+                        entity.get(Player::class).base,
+                        position.transformation,
+                        it.get(BoundingBox::class),
+                        it.get(Position::class).transformation
+                    )
+                }
+                if (platform != null) {
+                    // collide
+                    // TODO: correct the position
+                    return Idle(parent)
+                }
             }
-            // FIXME: hack. Should use colllider instead
-            if (entity.position.translation.y < y) {
-                entity.position.setGlobalTranslation(y = y)
-                return Idle(parent)
-            }
+
             parent.move(entity, delta)
-            entity.get(Position::class).addGlobalTranslation(y = velocity, delta = delta)
+            position.addGlobalTranslation(y = velocity, delta = delta)
             velocity -= gravity * delta
             return null
         }
@@ -159,11 +173,17 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
                 val player = entityFactory.engine.createSprite(spr.sprites.values.first(), spr)
                 val translation = it.transformation.toMat4().translation
                 player.position.setGlobalTranslation(translation.x, translation.y, 1f)
-                player.add(Player())
                 // bounding box
-                it.children.firstOrNull()?.run {
-                    player.add(BoundingBox.from(this.transformation.toMat4()))
+                lateinit var base: BoundingBox
+                it.children.forEach { child ->
+                    val component = BoundingBox.from(child.transformation.toMat4())
+                    player.add(component)
+                    // FIXME: hack to find the right bouding box. add a name to it?
+                    if(child.name == "base") {
+                        base = component
+                    }
                 }
+                player.add(Player(base))
             } else if (it.name.startsWith("coin")) {
                 val player = entityFactory.engine.createSprite(spr.sprites.values.first(), spr)
                 player.get(SpriteComponent::class).switchToAnimation("coin")
@@ -174,6 +194,9 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
                 it.children.firstOrNull()?.run {
                     player.add(BoundingBox.from(this.transformation.toMat4()))
                 }
+            } else if (it.name.startsWith("platform")) {
+                val platform = entityFactory.createFromNode(it, scene)
+                platform.add(Platform())
             } else {
                 entityFactory.createFromNode(it, scene)
             }
@@ -185,6 +208,7 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
     }
 }
 
+// TODO: put that in the EntityFactory
 fun Engine.createSprite(sprite: Sprite, scene: Scene): Entity = create {
     add(Position())
     add(
