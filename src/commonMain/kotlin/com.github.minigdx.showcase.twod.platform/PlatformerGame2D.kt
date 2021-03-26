@@ -1,5 +1,8 @@
 package com.github.minigdx.showcase.twod.platform
 
+import com.curiouscreature.kotlin.math.Float3
+import com.curiouscreature.kotlin.math.Mat4
+import com.curiouscreature.kotlin.math.translation
 import com.dwursteisen.minigdx.scene.api.Scene
 import com.dwursteisen.minigdx.scene.api.common.Id
 import com.dwursteisen.minigdx.scene.api.model.Normal
@@ -21,6 +24,7 @@ import com.github.dwursteisen.minigdx.ecs.entities.Entity
 import com.github.dwursteisen.minigdx.ecs.entities.EntityFactory
 import com.github.dwursteisen.minigdx.ecs.entities.position
 import com.github.dwursteisen.minigdx.ecs.physics.AABBCollisionResolver
+import com.github.dwursteisen.minigdx.ecs.physics.RayResolver
 import com.github.dwursteisen.minigdx.ecs.states.State
 import com.github.dwursteisen.minigdx.ecs.systems.EntityQuery
 import com.github.dwursteisen.minigdx.ecs.systems.StateMachineSystem
@@ -28,9 +32,11 @@ import com.github.dwursteisen.minigdx.ecs.systems.System
 import com.github.dwursteisen.minigdx.file.get
 import com.github.dwursteisen.minigdx.game.Game
 import com.github.dwursteisen.minigdx.input.Key
+import com.github.dwursteisen.minigdx.math.Vector3
+import com.github.dwursteisen.minigdx.math.toVector3
 import kotlin.math.sqrt
 
-class Player(var base: BoundingBox) : StateMachineComponent()
+class Player : StateMachineComponent()
 class Coin : Component
 class Platform : Component
 
@@ -60,6 +66,8 @@ class PlayerSystem : StateMachineSystem(Player::class) {
 
     private val collider = AABBCollisionResolver()
 
+    private val rayResolver = RayResolver()
+
     class Idle(val parent: PlayerSystem) : State() {
 
         override fun onEnter(entity: Entity) {
@@ -88,17 +96,24 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 return Jump(parent)
             }
             if (parent.move(entity, delta)) {
-                return null
+                val closestHit = parent.platformHit(entity, delta, parent.platforms)
+
+                return if (closestHit == null) {
+                    // No platform under, let's fall
+                    Jump(parent, initialVelocity = 0f)
+                } else {
+                    // There is still a platform under us
+                    null
+                }
             }
 
             return Idle(parent)
         }
     }
 
-    class Jump(val parent: PlayerSystem) : State() {
+    class Jump(val parent: PlayerSystem, initialVelocity: Float? = null) : State() {
 
-        private val gravity = JUMP_HEIGHT / (JUMP_DURATION * JUMP_DURATION)
-        private var velocity = sqrt(gravity * JUMP_HEIGHT)
+        private var velocity = initialVelocity ?: sqrt(GRAVITY * JUMP_HEIGHT)
 
         override fun onEnter(entity: Entity) {
             entity.get(SpriteComponent::class).switchToAnimation("jump_up")
@@ -109,24 +124,23 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             if (velocity < 0f) {
                 entity.get(SpriteComponent::class).switchToAnimation("jump_down")
 
-                val platform = parent.platforms.firstOrNull {
-                    parent.collider.collide(
-                        entity.get(Player::class).base,
-                        position.transformation,
-                        it.get(BoundingBox::class),
-                        it.get(Position::class).transformation
-                    )
-                }
-                if (platform != null) {
-                    // collide
-                    // TODO: correct the position
+                val closestHit = parent.platformHit(entity, delta, parent.platforms)
+
+                if (closestHit != null) {
+                    val (platform, hit) = closestHit
+                    val bb = platform.get(BoundingBox::class).transform(platform)
+                    val y = bb.max.y
+                    val deltaY = y - hit.y
+                    val base = entity.chidrens.first { it.get(BoundingBox::class).name == "base" }
+                    val result = deltaY
+                    entity.get(Position::class).addGlobalTranslation(y = result)
                     return Idle(parent)
                 }
             }
 
             parent.move(entity, delta)
             position.addGlobalTranslation(y = velocity, delta = delta)
-            velocity -= gravity * delta
+            velocity -= GRAVITY * delta
             return null
         }
 
@@ -134,6 +148,7 @@ class PlayerSystem : StateMachineSystem(Player::class) {
 
             const val JUMP_HEIGHT = 2.5f // World unit
             const val JUMP_DURATION = 0.2f // Duration of the jump
+            const val GRAVITY = JUMP_HEIGHT / (JUMP_DURATION * JUMP_DURATION)
         }
     }
 
@@ -156,6 +171,43 @@ class PlayerSystem : StateMachineSystem(Player::class) {
         }
     }
 
+    private fun platformHit(
+        player: Entity,
+        delta: Seconds,
+        platforms: List<Entity>
+    ): Pair<Entity, Vector3>? {
+        val base = player.chidrens.first { it.get(BoundingBox::class).name == "base" }
+
+        val transformation = base.walkOut(base.get(Position::class).transformation) { acc ->
+            this.get(Position::class).transformation * acc
+        }
+
+        val box = base.get(BoundingBox::class)
+
+        val lowerLeft =
+            (transformation * translation(Float3(box.center.x, box.min.y, box.center.z))).translation.toVector3()
+
+        // TODO: try with lower left and lower right instead
+        // Take only the center lowest y / should check on both side instead
+        val map = platforms.mapNotNull { platform ->
+
+            val intersectRayBounds = rayResolver.intersectRayBounds(
+                lowerLeft,
+                Vector3.MINUS_Y,
+                platform
+            )
+            if (intersectRayBounds == null) {
+                null
+            } else {
+                platform to intersectRayBounds
+            }
+        }
+        return map
+            .filter { (_, hit) -> hit.dist2(lowerLeft) <= 0.1 * 0.1f }
+            .map { (p, _) -> p to lowerLeft }
+            .firstOrNull()
+    }
+
     override fun initialState(entity: Entity): State {
         return Idle(this)
     }
@@ -170,29 +222,27 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
         scene.children.forEach {
 
             if (it.name == "player") {
-                val player = entityFactory.engine.createSprite(spr.sprites.values.first(), spr)
-                val translation = it.transformation.toMat4().translation
-                player.position.setGlobalTranslation(translation.x, translation.y, 1f)
+                val player = entityFactory.engine.createSprite(
+                    spr.sprites.values.first(),
+                    spr,
+                    it.transformation.toMat4()
+                )
+
                 // bounding box
-                lateinit var base: BoundingBox
                 it.children.forEach { child ->
-                    val component = BoundingBox.from(child.transformation.toMat4())
-                    player.add(component)
-                    // FIXME: hack to find the right bouding box. add a name to it?
-                    if(child.name == "base") {
-                        base = component
-                    }
+                    entityFactory.createBox(child, scene, player)
                 }
-                player.add(Player(base))
+                player.add(Player())
             } else if (it.name.startsWith("coin")) {
-                val player = entityFactory.engine.createSprite(spr.sprites.values.first(), spr)
+                val player =
+                    entityFactory.engine.createSprite(spr.sprites.values.first(), spr, it.transformation.toMat4())
                 player.get(SpriteComponent::class).switchToAnimation("coin")
                 val translation = it.transformation.toMat4().translation
-                player.position.setGlobalTranslation(translation.x, translation.y, 1f)
+                player.position.setGlobalTranslation(translation.x, translation.y, 0.5f)
                 player.add(Coin())
                 // bounding box
                 it.children.firstOrNull()?.run {
-                    player.add(BoundingBox.from(this.transformation.toMat4()))
+                    entityFactory.createBox(this, scene, player)
                 }
             } else if (it.name.startsWith("platform")) {
                 val platform = entityFactory.createFromNode(it, scene)
@@ -209,8 +259,8 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
 }
 
 // TODO: put that in the EntityFactory
-fun Engine.createSprite(sprite: Sprite, scene: Scene): Entity = create {
-    add(Position())
+fun Engine.createSprite(sprite: Sprite, scene: Scene, transformation: Mat4): Entity = create {
+    add(Position(transformation, transformation, transformation))
     add(
         SpriteComponent(
             animations = sprite.animations,
@@ -228,22 +278,22 @@ fun Engine.createSprite(sprite: Sprite, scene: Scene): Entity = create {
                 materialId = sprite.materialReference,
                 vertices = listOf(
                     Vertex(
-                        com.dwursteisen.minigdx.scene.api.model.Position(-0.5f, -0.5f, 0f),
+                        com.dwursteisen.minigdx.scene.api.model.Position(-1f, -1f, 0f),
                         Normal(0f, 0f, 0f),
                         uv = UV(0f, 0f)
                     ),
                     Vertex(
-                        com.dwursteisen.minigdx.scene.api.model.Position(0.5f, -0.5f, 0f),
+                        com.dwursteisen.minigdx.scene.api.model.Position(1f, -1f, 0f),
                         Normal(0f, 0f, 0f),
                         uv = UV(0f, 0f)
                     ),
                     Vertex(
-                        com.dwursteisen.minigdx.scene.api.model.Position(-0.5f, 0.5f, 0f),
+                        com.dwursteisen.minigdx.scene.api.model.Position(-1f, 1f, 0f),
                         Normal(0f, 0f, 0f),
                         uv = UV(0f, 0f)
                     ),
                     Vertex(
-                        com.dwursteisen.minigdx.scene.api.model.Position(0.5f, 0.5f, 0f),
+                        com.dwursteisen.minigdx.scene.api.model.Position(1f, 1f, 0f),
                         Normal(0f, 0f, 0f),
                         uv = UV(0f, 0f)
                     )
