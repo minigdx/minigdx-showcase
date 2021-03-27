@@ -1,8 +1,6 @@
 package com.github.minigdx.showcase.twod.platform
 
-import com.curiouscreature.kotlin.math.Float3
 import com.curiouscreature.kotlin.math.Mat4
-import com.curiouscreature.kotlin.math.translation
 import com.dwursteisen.minigdx.scene.api.Scene
 import com.dwursteisen.minigdx.scene.api.common.Id
 import com.dwursteisen.minigdx.scene.api.model.Normal
@@ -33,7 +31,6 @@ import com.github.dwursteisen.minigdx.file.get
 import com.github.dwursteisen.minigdx.game.Game
 import com.github.dwursteisen.minigdx.input.Key
 import com.github.dwursteisen.minigdx.math.Vector3
-import com.github.dwursteisen.minigdx.math.toVector3
 import kotlin.math.sqrt
 
 class Player : StateMachineComponent()
@@ -63,8 +60,6 @@ class CoinSystem : System(EntityQuery(Coin::class)) {
 class PlayerSystem : StateMachineSystem(Player::class) {
 
     private val platforms by interested(EntityQuery(Platform::class))
-
-    private val collider = AABBCollisionResolver()
 
     private val rayResolver = RayResolver()
 
@@ -96,8 +91,7 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 return Jump(parent)
             }
             if (parent.move(entity, delta)) {
-                val closestHit = parent.platformHit(entity, delta, parent.platforms)
-
+                val closestHit = parent.platformHit(entity, parent.platforms)
                 return if (closestHit == null) {
                     // No platform under, let's fall
                     Jump(parent, initialVelocity = 0f)
@@ -124,15 +118,11 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             if (velocity < 0f) {
                 entity.get(SpriteComponent::class).switchToAnimation("jump_down")
 
-                val closestHit = parent.platformHit(entity, delta, parent.platforms)
+                val closestHit = parent.platformHit(entity, parent.platforms)
 
                 if (closestHit != null) {
                     val (platform, hit) = closestHit
-                    val bb = platform.get(BoundingBox::class).transform(platform)
-                    val y = bb.max.y
-                    val deltaY = y - hit.y
-                    val base = entity.chidrens.first { it.get(BoundingBox::class).name == "base" }
-                    val result = deltaY
+                    val result = platform.max.y - hit.y
                     entity.get(Position::class).addGlobalTranslation(y = result)
                     return Idle(parent)
                 }
@@ -173,22 +163,13 @@ class PlayerSystem : StateMachineSystem(Player::class) {
 
     private fun platformHit(
         player: Entity,
-        delta: Seconds,
         platforms: List<Entity>
-    ): Pair<Entity, Vector3>? {
-        val base = player.chidrens.first { it.get(BoundingBox::class).name == "base" }
-
-        val transformation = base.walkOut(base.get(Position::class).transformation) { acc ->
-            this.get(Position::class).transformation * acc
-        }
-
+    ): Pair<BoundingBox, Vector3>? {
+        val base = player.getChild("base")
         val box = base.get(BoundingBox::class)
 
-        val lowerLeft =
-            (transformation * translation(Float3(box.center.x, box.min.y, box.center.z))).translation.toVector3()
+        val lowerLeft = Vector3(box.center.x, box.min.y, box.center.z)
 
-        // TODO: try with lower left and lower right instead
-        // Take only the center lowest y / should check on both side instead
         val map = platforms.mapNotNull { platform ->
 
             val intersectRayBounds = rayResolver.intersectRayBounds(
@@ -199,7 +180,7 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             if (intersectRayBounds == null) {
                 null
             } else {
-                platform to intersectRayBounds
+                platform.get(BoundingBox::class) to intersectRayBounds
             }
         }
         return map
