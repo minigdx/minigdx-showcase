@@ -1,6 +1,7 @@
 package com.github.minigdx.showcase.twod.platform
 
 import com.curiouscreature.kotlin.math.Mat4
+import com.curiouscreature.kotlin.math.Quaternion.Companion.fromEulers
 import com.dwursteisen.minigdx.scene.api.Scene
 import com.dwursteisen.minigdx.scene.api.common.Id
 import com.dwursteisen.minigdx.scene.api.model.Normal
@@ -33,27 +34,33 @@ import com.github.dwursteisen.minigdx.input.Key
 import com.github.dwursteisen.minigdx.math.Vector3
 import kotlin.math.sqrt
 
-class Player : StateMachineComponent()
+class Player(var direction: Float = 1f) : StateMachineComponent()
 class Coin : Component
+class CoinHixBox : Component
 class Platform : Component
 
-class CoinSystem : System(EntityQuery(Coin::class)) {
+class CoinHitBoxSystem : System(EntityQuery(CoinHixBox::class)) {
 
     private val collider = AABBCollisionResolver()
 
     private val player by interested(EntityQuery(Player::class))
 
     override fun update(delta: Seconds, entity: Entity) {
-        entity.get(Position::class).addLocalRotation(y = 90f, delta = delta)
-        if (entity.hasComponent(BoundingBox::class) && collider.collide(
+        if (collider.collide(
                 entity,
-                entity.position.globalTransformation,
-                player.first()
+                player.first().getChild("body")
             )
         ) {
             // TODO: play a sound?
             entity.destroy()
         }
+    }
+}
+
+class CoinSystem : System(EntityQuery(Coin::class)) {
+
+    override fun update(delta: Seconds, entity: Entity) {
+        entity.get(Position::class).addLocalRotation(y = 90f, delta = delta)
     }
 }
 
@@ -149,12 +156,14 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             if (position.translation.x - (5f * delta) > -6.5f) {
                 position.addGlobalTranslation(x = -5f, delta = delta)
             }
+            position.setGlobalRotation(fromEulers(0f, 1f, 0f, 180f))
             true
         } else if (input.isKeyPressed(Key.ARROW_RIGHT)) {
             // still in the screen limit
             if (position.translation.x + (5f * delta) < 6.5f) {
                 position.addGlobalTranslation(x = 5f, delta = delta)
             }
+            position.setGlobalRotation(fromEulers(0f, 1f, 0f, 0f))
             true
         } else {
             false
@@ -207,7 +216,9 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
                     spr.sprites.values.first(),
                     spr,
                     it.transformation.toMat4()
-                )
+                ).also { e ->
+                    e.name = it.name
+                }
 
                 // bounding box
                 it.children.forEach { child ->
@@ -215,16 +226,21 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
                 }
                 player.add(Player())
             } else if (it.name.startsWith("coin")) {
-                val player =
-                    entityFactory.engine.createSprite(spr.sprites.values.first(), spr, it.transformation.toMat4())
-                player.get(SpriteComponent::class).switchToAnimation("coin")
-                val translation = it.transformation.toMat4().translation
-                player.position.setGlobalTranslation(translation.x, translation.y, 0.5f)
-                player.add(Coin())
-                // bounding box
-                it.children.firstOrNull()?.run {
-                    entityFactory.createBox(this, scene, player)
-                }
+                val hitbox = entityFactory.createBox(it, scene)
+                hitbox.add(CoinHixBox())
+
+                val sprite = entityFactory.engine.createSprite(
+                    spr.sprites.values.first(),
+                    spr,
+                    it.children.first().transformation.toMat4()
+                )
+                    .also { e ->
+                        e.name = it.name
+
+                    }
+                sprite.get(SpriteComponent::class).switchToAnimation("coin")
+                sprite.add(Coin())
+                sprite.attachTo(hitbox)
             } else if (it.name.startsWith("platform")) {
                 val platform = entityFactory.createFromNode(it, scene)
                 platform.add(Platform())
@@ -235,7 +251,7 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
     }
 
     override fun createSystems(engine: Engine): List<System> {
-        return super.createSystems(engine) + listOf(CoinSystem(), PlayerSystem())
+        return super.createSystems(engine) + listOf(CoinHitBoxSystem(), CoinSystem(), PlayerSystem())
     }
 }
 
