@@ -4,6 +4,7 @@ import com.github.dwursteisen.minigdx.GameApplicationBuilder
 import com.github.dwursteisen.minigdx.GameConfiguration
 import com.github.dwursteisen.minigdx.GameScreenConfiguration
 import com.github.dwursteisen.minigdx.Window
+import com.github.minigdx.showcase.treed.platform.PlatformerGame3D
 import com.github.minigdx.showcase.twod.platform.PlatformerGame2D
 
 class Main {
@@ -14,7 +15,7 @@ class Main {
         fun main(vararg args: String) {
             GameApplicationBuilder(
                 gameFactory = {
-                    PlatformerGame2D(it)
+                    PlatformerGame3D(it)
                 },
                 gameConfigurationFactory = {
                     GameConfiguration(
