@@ -16,13 +16,13 @@ class Main {
         fun main(vararg args: String) {
             GameApplicationBuilder(
                 gameFactory = {
-                    DanceGame(it)
+                    PlatformerGame3D(it)
                 },
                 gameConfigurationFactory = {
                     GameConfiguration(
                         "MiniGDX Showcase",
                         gameScreenConfiguration = GameScreenConfiguration.WithRatio(16f/9f),
-                        debug = true,
+                        debug = false,
                         window = Window(1024, (1024 * 9f/16f).toInt(), "minigdx")
                     )
 
