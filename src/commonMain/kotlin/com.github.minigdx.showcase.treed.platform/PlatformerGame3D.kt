@@ -43,7 +43,6 @@ class RootSystem : System(EntityQuery(Root::class)) {
         val box = player.first().get(BoundingBox::class)
         if (input.isKeyPressed(Key.ARROW_RIGHT)) {
             val closestHit = platformHit(
-                entity,
                 platforms,
                 Vector3(box.max.x, box.center.y, box.center.z),
                 Vector3.X
@@ -53,7 +52,6 @@ class RootSystem : System(EntityQuery(Root::class)) {
             }
         } else if (input.isKeyPressed(Key.ARROW_LEFT)) {
             val closestHit = platformHit(
-                entity,
                 platforms,
                 Vector3(box.min.x, box.center.y, box.center.z),
                 Vector3.MINUS_X
@@ -110,10 +108,9 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             if (parent.input.isKeyPressed(Key.SPACE)) {
                 return Jump(parent)
             }
-            if (parent.move(entity, delta)) {
+            if (parent.move(entity)) {
                 val box = entity.get(BoundingBox::class)
                 val closestHit = platformHit(
-                    entity,
                     parent.platforms,
                     Vector3(box.center.x, box.min.y, box.center.z),
                     Vector3.MINUS_Y
@@ -145,7 +142,6 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 entity.get(SpriteComponent::class).switchToAnimation("jump_down")
                 val box = entity.get(BoundingBox::class)
                 val closestHit = platformHit(
-                    entity,
                     parent.platforms,
                     Vector3(box.center.x, box.min.y, box.center.z),
                     Vector3.MINUS_Y
@@ -159,7 +155,7 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 }
             }
 
-            parent.move(entity, delta)
+            parent.move(entity)
             position.addGlobalTranslation(y = velocity, delta = delta)
             velocity -= GRAVITY * delta
             return null
@@ -173,9 +169,8 @@ class PlayerSystem : StateMachineSystem(Player::class) {
         }
     }
 
-    private fun move(entity: Entity, delta: Seconds): Boolean {
+    private fun move(entity: Entity): Boolean {
         val position = entity.position
-        val box = entity.get(BoundingBox::class)
         return if (input.isKeyPressed(Key.ARROW_LEFT)) {
             position.setGlobalRotation(Quaternion.fromEulers(0f, 1f, 0f, 180f))
             true
@@ -197,7 +192,6 @@ object CollisionUtils {
     private val rayResolver = RayResolver()
 
     fun platformHit(
-        player: Entity,
         platforms: List<Entity>,
         startPoint: Vector3,
         direction: Vector3
@@ -246,7 +240,7 @@ class PlatformerGame3D(override val gameContext: GameContext) : Game {
                 }
 
                 // bounding box
-                val box = entityFactory.createBox(it, scene, player)
+                val box = entityFactory.createBox(it, scene).attachTo(player)
                 player.add(Player())
                 player.add(box.get(BoundingBox::class))
                 box.destroy()
@@ -268,6 +262,6 @@ class PlatformerGame3D(override val gameContext: GameContext) : Game {
     }
 
     override fun createSystems(engine: Engine): List<System> {
-        return super.createSystems(engine) + listOf(RootSystem(), CameraSystem(), PlayerSystem())
+        return listOf(RootSystem(), CameraSystem(), PlayerSystem())
     }
 }

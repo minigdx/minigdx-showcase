@@ -44,6 +44,6 @@ class DanceGame(override val gameContext: GameContext) : Game {
     }
 
     override fun createSystems(engine: Engine): List<System> {
-        return super.createSystems(engine) + listOf(TurnSystem())
+        return listOf(TurnSystem())
     }
 }
