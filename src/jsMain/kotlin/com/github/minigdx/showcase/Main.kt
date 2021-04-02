@@ -3,6 +3,8 @@ package com.github.minigdx.showcase
 import com.github.dwursteisen.minigdx.GameApplicationBuilder
 import com.github.dwursteisen.minigdx.GameConfiguration
 import com.github.dwursteisen.minigdx.GameScreenConfiguration
+import com.github.minigdx.showcase.dance.DanceGame
+import com.github.minigdx.showcase.physic.SatTank
 import com.github.minigdx.showcase.treed.platform.PlatformerGame3D
 import com.github.minigdx.showcase.twod.platform.PlatformerGame2D
 import kotlinx.browser.document
@@ -32,7 +34,9 @@ fun main() {
             when(gameName) {
                 "2d-platformer" -> PlatformerGame2D(it)
                 "3d-platformer" -> PlatformerGame3D(it)
-                else -> TODO()
+                "dance" -> DanceGame(it)
+                "tank" -> SatTank(it)
+                else -> TODO("$gameName seems to be an invalid game name. check again.")
             }
         }
     ).start()

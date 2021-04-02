@@ -222,7 +222,7 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
 
                 // bounding box
                 it.children.forEach { child ->
-                    entityFactory.createBox(child, scene, player)
+                    entityFactory.createBox(child, scene).attachTo(player)
                 }
                 player.add(Player())
             } else if (it.name.startsWith("coin")) {
@@ -251,7 +251,7 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
     }
 
     override fun createSystems(engine: Engine): List<System> {
-        return super.createSystems(engine) + listOf(CoinHitBoxSystem(), CoinSystem(), PlayerSystem())
+        return listOf(CoinHitBoxSystem(), CoinSystem(), PlayerSystem())
     }
 }
 

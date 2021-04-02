@@ -71,6 +71,7 @@
    { "name": "coin", "from": 6, "to": 6, "direction": "forward" }
   ],
   "layers": [
+   { "name": "Layer 2", "opacity": 255, "blendMode": "normal" },
    { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [

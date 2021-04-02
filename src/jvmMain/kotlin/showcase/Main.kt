@@ -3,7 +3,15 @@ package showcase
 import com.github.dwursteisen.minigdx.GameApplicationBuilder
 import com.github.dwursteisen.minigdx.GameConfiguration
 import com.github.dwursteisen.minigdx.GameScreenConfiguration
+import com.github.dwursteisen.minigdx.Seconds
 import com.github.dwursteisen.minigdx.Window
+import com.github.dwursteisen.minigdx.ecs.components.Component
+import com.github.dwursteisen.minigdx.ecs.entities.Entity
+import com.github.dwursteisen.minigdx.ecs.systems.EntityQuery
+import com.github.dwursteisen.minigdx.ecs.systems.System
+import com.github.minigdx.showcase.dance.DanceGame
+import com.github.minigdx.showcase.physic.SatTank
+import com.github.minigdx.showcase.treed.platform.PlatformerGame3D
 import com.github.minigdx.showcase.twod.platform.PlatformerGame2D
 
 class Main {
@@ -14,7 +22,7 @@ class Main {
         fun main(vararg args: String) {
             GameApplicationBuilder(
                 gameFactory = {
-                    PlatformerGame2D(it)
+                    SatTank(it)
                 },
                 gameConfigurationFactory = {
                     GameConfiguration(
