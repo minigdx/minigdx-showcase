@@ -48,7 +48,7 @@ class RootSystem : System(EntityQuery(Root::class)) {
                 Vector3.X
             )
             if (closestHit == null) {
-                entity.position.addGlobalRotation(y = -90f, delta = delta)
+                entity.position.addWorldRotation(y = -90f, delta = delta)
             }
         } else if (input.isKeyPressed(Key.ARROW_LEFT)) {
             val closestHit = platformHit(
@@ -57,7 +57,7 @@ class RootSystem : System(EntityQuery(Root::class)) {
                 Vector3.MINUS_X
             )
             if (closestHit == null) {
-                entity.position.addGlobalRotation(y = 90f, delta = delta)
+                entity.position.addWorldRotation(y = 90f, delta = delta)
             }
         }
     }
@@ -68,7 +68,7 @@ class CameraSystem : System(EntityQuery(Camera::class)) {
     val player by interested(EntityQuery(Player::class))
 
     override fun update(delta: Seconds, entity: Entity) {
-        entity.position.setGlobalTranslation(
+        entity.position.setWorldTranslation(
             y = Interpolations.lerp(
                 player.first().position.translation.y,
                 entity.position.translation.y
@@ -150,13 +150,13 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 if (closestHit != null) {
                     val (platform, hit) = closestHit
                     val result = platform.max.y - hit.y
-                    entity.get(Position::class).addGlobalTranslation(y = result)
+                    entity.get(Position::class).addWorldTranslation(y = result)
                     return Idle(parent)
                 }
             }
 
             parent.move(entity)
-            position.addGlobalTranslation(y = velocity, delta = delta)
+            position.addWorldTranslation(y = velocity, delta = delta)
             velocity -= GRAVITY * delta
             return null
         }
@@ -172,10 +172,10 @@ class PlayerSystem : StateMachineSystem(Player::class) {
     private fun move(entity: Entity): Boolean {
         val position = entity.position
         return if (input.isKeyPressed(Key.ARROW_LEFT)) {
-            position.setGlobalRotation(Quaternion.fromEulers(0f, 1f, 0f, 180f))
+            position.setWorldRotation(Quaternion.fromEulers(0f, 1f, 0f, 180f))
             true
         } else if (input.isKeyPressed(Key.ARROW_RIGHT)) {
-            position.setGlobalRotation(Quaternion.fromEulers(0f, 1f, 0f, 0f))
+            position.setWorldRotation(Quaternion.fromEulers(0f, 1f, 0f, 0f))
             true
         } else {
             false

@@ -130,13 +130,13 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 if (closestHit != null) {
                     val (platform, hit) = closestHit
                     val result = platform.max.y - hit.y
-                    entity.get(Position::class).addGlobalTranslation(y = result)
+                    entity.get(Position::class).addWorldTranslation(y = result)
                     return Idle(parent)
                 }
             }
 
             parent.move(entity, delta)
-            position.addGlobalTranslation(y = velocity, delta = delta)
+            position.addWorldTranslation(y = velocity, delta = delta)
             velocity -= GRAVITY * delta
             return null
         }
@@ -154,16 +154,16 @@ class PlayerSystem : StateMachineSystem(Player::class) {
         return if (input.isKeyPressed(Key.ARROW_LEFT)) {
             // still in the screen limit
             if (position.translation.x - (5f * delta) > -6.5f) {
-                position.addGlobalTranslation(x = -5f, delta = delta)
+                position.addWorldTranslation(x = -5f, delta = delta)
             }
-            position.setGlobalRotation(fromEulers(0f, 1f, 0f, 180f))
+            position.setWorldRotation(fromEulers(0f, 1f, 0f, 180f))
             true
         } else if (input.isKeyPressed(Key.ARROW_RIGHT)) {
             // still in the screen limit
             if (position.translation.x + (5f * delta) < 6.5f) {
-                position.addGlobalTranslation(x = 5f, delta = delta)
+                position.addWorldTranslation(x = 5f, delta = delta)
             }
-            position.setGlobalRotation(fromEulers(0f, 1f, 0f, 0f))
+            position.setWorldRotation(fromEulers(0f, 1f, 0f, 0f))
             true
         } else {
             false
