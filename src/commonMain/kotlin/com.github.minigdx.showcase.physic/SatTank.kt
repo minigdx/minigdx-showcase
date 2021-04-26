@@ -81,7 +81,7 @@ class TankSystem : System(EntityQuery(Tank::class)) {
         var duration = 1f
         while(duration > 0f) {
             duration -= delta
-            target.position.addGlobalRotation(y = 180f, delta = delta)
+            target.position.addWorldRotation(y = 180f, delta = delta)
             yield()
         }
         target.destroy()
