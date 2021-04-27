@@ -50,9 +50,13 @@ class CamerasSystem : System(EntityQuery.Companion.of(Camera::class)) {
 
         percent = min(1f, percent + delta)
 
-        if(input.isKeyJustPressed(Key.SPACE)) {
+        if (input.isKeyJustPressed(Key.SPACE) || input.isKeyJustPressed(Key.ARROW_RIGHT)) {
             percent = 0f
             currentIndex = (currentIndex + 1) % camerasSpot.size
+            targetEntity = camerasSpot[currentIndex]
+        } else if (input.isKeyJustPressed(Key.ARROW_LEFT)) {
+            percent = 0f
+            currentIndex = (camerasSpot.size + (currentIndex - 1)) % camerasSpot.size
             targetEntity = camerasSpot[currentIndex]
         }
     }
