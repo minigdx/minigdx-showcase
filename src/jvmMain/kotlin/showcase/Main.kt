@@ -4,7 +4,7 @@ import com.github.dwursteisen.minigdx.GameApplicationBuilder
 import com.github.dwursteisen.minigdx.GameConfiguration
 import com.github.dwursteisen.minigdx.GameScreenConfiguration
 import com.github.dwursteisen.minigdx.Window
-import com.github.minigdx.showcase.physic.SatTank
+import com.github.minigdx.showcase.cameras.CamerasGame
 
 class Main {
 
@@ -14,7 +14,7 @@ class Main {
         fun main(vararg args: String) {
             GameApplicationBuilder(
                 gameFactory = {
-                    SatTank(it)
+                    CamerasGame(it)
                 },
                 gameConfigurationFactory = {
                     GameConfiguration(
