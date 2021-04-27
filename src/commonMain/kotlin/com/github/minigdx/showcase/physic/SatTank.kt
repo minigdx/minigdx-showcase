@@ -56,14 +56,14 @@ class TankSystem : System(EntityQuery(Tank::class)) {
         }
 
         // Copy the list as removing an entity might lead to a concurrent modification exception.
-        energies.toMutableList().forEach {
-            if (satCollisionResolver.collide(entity, it)) {
-                it.get(BoundingBox::class).touch = true
+        energies.toMutableList().forEach { cube ->
+            if (satCollisionResolver.collide(entity, cube)) {
+                cube.get(BoundingBox::class).touch = true
                 entity.get(BoundingBox::class).touch  = true
-                it.remove(Energie::class)
-                it.add(ScriptComponent(
+                cube.remove(Energie::class)
+                cube.add(ScriptComponent(
                     script = {
-                        destroyBox(it)
+                        destroyBox(cube)
                     }
                 ))
             }
