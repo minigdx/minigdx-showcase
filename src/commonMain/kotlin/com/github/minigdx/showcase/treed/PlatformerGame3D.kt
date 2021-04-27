@@ -1,4 +1,4 @@
-package com.github.minigdx.showcase.treed.platform
+package com.github.minigdx.showcase.treed
 
 import com.curiouscreature.kotlin.math.Quaternion
 import com.dwursteisen.minigdx.scene.api.Scene
@@ -25,10 +25,10 @@ import com.github.dwursteisen.minigdx.game.Game
 import com.github.dwursteisen.minigdx.input.Key
 import com.github.dwursteisen.minigdx.math.Interpolations
 import com.github.dwursteisen.minigdx.math.Vector3
-import com.github.minigdx.showcase.treed.platform.CollisionUtils.platformHit
-import com.github.minigdx.showcase.twod.platform.Platform
-import com.github.minigdx.showcase.twod.platform.Player
-import com.github.minigdx.showcase.twod.platform.createSprite
+import com.github.minigdx.showcase.treed.CollisionUtils.platformHit
+import com.github.minigdx.showcase.twod.Platform
+import com.github.minigdx.showcase.twod.Player
+import com.github.minigdx.showcase.twod.createSprite
 import kotlin.math.sqrt
 
 class Root : Component
@@ -68,7 +68,7 @@ class CameraSystem : System(EntityQuery(Camera::class)) {
     val player by interested(EntityQuery(Player::class))
 
     override fun update(delta: Seconds, entity: Entity) {
-        entity.position.setWorldTranslation(
+        entity.position.setGlobalTranslation(
             y = Interpolations.lerp(
                 player.first().position.translation.y,
                 entity.position.translation.y
@@ -150,13 +150,13 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 if (closestHit != null) {
                     val (platform, hit) = closestHit
                     val result = platform.max.y - hit.y
-                    entity.get(Position::class).addWorldTranslation(y = result)
+                    entity.get(Position::class).addGlobalTranslation(y = result)
                     return Idle(parent)
                 }
             }
 
             parent.move(entity)
-            position.addWorldTranslation(y = velocity, delta = delta)
+            position.addGlobalTranslation(y = velocity, delta = delta)
             velocity -= GRAVITY * delta
             return null
         }

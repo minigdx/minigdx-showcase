@@ -1,4 +1,4 @@
-package com.github.minigdx.showcase.twod.platform
+package com.github.minigdx.showcase.twod
 
 import com.curiouscreature.kotlin.math.Mat4
 import com.curiouscreature.kotlin.math.Quaternion.Companion.fromEulers
@@ -130,13 +130,13 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 if (closestHit != null) {
                     val (platform, hit) = closestHit
                     val result = platform.max.y - hit.y
-                    entity.get(Position::class).addWorldTranslation(y = result)
+                    entity.get(Position::class).addGlobalTranslation(y = result)
                     return Idle(parent)
                 }
             }
 
             parent.move(entity, delta)
-            position.addWorldTranslation(y = velocity, delta = delta)
+            position.addGlobalTranslation(y = velocity, delta = delta)
             velocity -= GRAVITY * delta
             return null
         }
@@ -154,14 +154,14 @@ class PlayerSystem : StateMachineSystem(Player::class) {
         return if (input.isKeyPressed(Key.ARROW_LEFT)) {
             // still in the screen limit
             if (position.translation.x - (5f * delta) > -6.5f) {
-                position.addWorldTranslation(x = -5f, delta = delta)
+                position.addGlobalTranslation(x = -5f, delta = delta)
             }
             position.setWorldRotation(fromEulers(0f, 1f, 0f, 180f))
             true
         } else if (input.isKeyPressed(Key.ARROW_RIGHT)) {
             // still in the screen limit
             if (position.translation.x + (5f * delta) < 6.5f) {
-                position.addWorldTranslation(x = 5f, delta = delta)
+                position.addGlobalTranslation(x = 5f, delta = delta)
             }
             position.setWorldRotation(fromEulers(0f, 1f, 0f, 0f))
             true

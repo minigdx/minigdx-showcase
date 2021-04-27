@@ -36,7 +36,7 @@ class DanceGame(override val gameContext: GameContext) : Game {
         scene.children.forEach {
             val e = entityFactory.createFromNode(it, scene)
             if (it.type == ObjectType.LIGHT) {
-                e.position.setWorldTranslation(1.4f, 1.75f, 2.8f)
+                e.position.setGlobalTranslation(1.4f, 1.75f, 2.8f)
             } else if (it.type == ObjectType.ARMATURE) {
                 e.add(Armature())
             }

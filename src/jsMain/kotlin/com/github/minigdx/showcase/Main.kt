@@ -5,8 +5,8 @@ import com.github.dwursteisen.minigdx.GameConfiguration
 import com.github.dwursteisen.minigdx.GameScreenConfiguration
 import com.github.minigdx.showcase.dance.DanceGame
 import com.github.minigdx.showcase.physic.SatTank
-import com.github.minigdx.showcase.treed.platform.PlatformerGame3D
-import com.github.minigdx.showcase.twod.platform.PlatformerGame2D
+import com.github.minigdx.showcase.treed.PlatformerGame3D
+import com.github.minigdx.showcase.twod.PlatformerGame2D
 import kotlinx.browser.document
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.asList
@@ -31,7 +31,7 @@ fun main() {
         },
         gameFactory = {
             val gameName = canvas.getAttribute("property").toString()
-            when(gameName) {
+            when (gameName) {
                 "2d-platformer" -> PlatformerGame2D(it)
                 "3d-platformer" -> PlatformerGame3D(it)
                 "dance" -> DanceGame(it)

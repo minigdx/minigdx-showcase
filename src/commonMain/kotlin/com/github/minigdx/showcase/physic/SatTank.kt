@@ -19,11 +19,8 @@ import com.github.dwursteisen.minigdx.game.Game
 import com.github.dwursteisen.minigdx.input.Key
 import com.github.dwursteisen.minigdx.math.Interpolations
 import com.github.dwursteisen.minigdx.math.Vector3
-import kotlin.math.abs
-import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sin
 
 class Tank(
     var currentSpeed: Float = 0f,
@@ -38,9 +35,7 @@ class TankSystem : System(EntityQuery(Tank::class)) {
 
     private val satCollisionResolver = SATCollisionResolver()
 
-    private val energie by interested(EntityQuery(Energie::class))
-
-    private val cubes by interested(EntityQuery(Cube::class))
+    private val energies by interested(EntityQuery(Energie::class))
 
     override fun update(delta: Seconds, entity: Entity) {
         val tank = entity.get(Tank::class)
@@ -61,16 +56,16 @@ class TankSystem : System(EntityQuery(Tank::class)) {
         }
 
         // Copy the list as removing an entity might lead to a concurrent modification exception.
-        energie.toMutableList().forEach {
+        energies.toMutableList().forEach {
             if (satCollisionResolver.collide(entity, it)) {
                 it.get(BoundingBox::class).touch = true
                 entity.get(BoundingBox::class).touch  = true
+                it.remove(Energie::class)
                 it.add(ScriptComponent(
                     script = {
                         destroyBox(it)
                     }
                 ))
-                it.remove(Energie::class)
             }
         }
         val speed = tank.currentDirection.copy().scale(-tank.currentSpeed * delta)
@@ -84,7 +79,9 @@ class TankSystem : System(EntityQuery(Tank::class)) {
             target.position.addWorldRotation(y = 180f, delta = delta)
             yield()
         }
-        target.destroy()
+        executeInGameLoop {
+            target.destroy()
+        }
     }
 }
 
