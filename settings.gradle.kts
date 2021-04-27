@@ -1,8 +1,5 @@
 rootProject.name = "minigdx-showcase"
 
-// includeBuild("../3d-skeleton")
-
-
 pluginManagement {
     repositories {
         gradlePluginPortal()
