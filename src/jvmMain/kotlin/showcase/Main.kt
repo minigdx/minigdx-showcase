@@ -5,6 +5,7 @@ import com.github.dwursteisen.minigdx.GameConfiguration
 import com.github.dwursteisen.minigdx.GameScreenConfiguration
 import com.github.dwursteisen.minigdx.Window
 import com.github.minigdx.showcase.cameras.CamerasGame
+import com.github.minigdx.showcase.dance.DanceGame
 
 class Main {
 
