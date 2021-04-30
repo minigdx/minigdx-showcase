@@ -240,7 +240,7 @@ class PlatformerGame3D(override val gameContext: GameContext) : Game {
                 }
 
                 // bounding box
-                val box = entityFactory.createBox(it, scene).attachTo(player)
+                val box = entityFactory.createBox(it).attachTo(player)
                 player.add(Player())
                 player.add(box.get(BoundingBox::class))
                 box.destroy()

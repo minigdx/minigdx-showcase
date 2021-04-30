@@ -6,6 +6,7 @@ import com.github.dwursteisen.minigdx.GameScreenConfiguration
 import com.github.minigdx.showcase.cameras.CamerasGame
 import com.github.minigdx.showcase.dance.DanceGame
 import com.github.minigdx.showcase.physic.SatTank
+import com.github.minigdx.showcase.text.SampleText
 import com.github.minigdx.showcase.treed.PlatformerGame3D
 import com.github.minigdx.showcase.twod.PlatformerGame2D
 import kotlinx.browser.document
@@ -38,6 +39,7 @@ fun main() {
                 "dance" -> DanceGame(it)
                 "tank" -> SatTank(it)
                 "cameras" -> CamerasGame(it)
+                "sampleText" -> SampleText(it)
                 else -> TODO("$gameName seems to be an invalid game name. check again.")
             }
         }

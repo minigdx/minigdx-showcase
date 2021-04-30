@@ -222,11 +222,11 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
 
                 // bounding box
                 it.children.forEach { child ->
-                    entityFactory.createBox(child, scene).attachTo(player)
+                    entityFactory.createBox(child).attachTo(player)
                 }
                 player.add(Player())
             } else if (it.name.startsWith("coin")) {
-                val hitbox = entityFactory.createBox(it, scene)
+                val hitbox = entityFactory.createBox(it)
                 hitbox.add(CoinHixBox())
 
                 val sprite = entityFactory.engine.createSprite(
