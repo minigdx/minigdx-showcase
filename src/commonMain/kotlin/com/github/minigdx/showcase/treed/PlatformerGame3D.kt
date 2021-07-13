@@ -1,17 +1,15 @@
 package com.github.minigdx.showcase.treed
 
 import com.curiouscreature.kotlin.math.Quaternion
-import com.dwursteisen.minigdx.scene.api.Scene
 import com.dwursteisen.minigdx.scene.api.relation.ObjectType
 import com.github.dwursteisen.minigdx.GameContext
 import com.github.dwursteisen.minigdx.Seconds
-import com.github.dwursteisen.minigdx.api.toMat4
 import com.github.dwursteisen.minigdx.ecs.Engine
-import com.github.dwursteisen.minigdx.ecs.components.Camera
+import com.github.dwursteisen.minigdx.ecs.components.BoundingBoxComponent
+import com.github.dwursteisen.minigdx.ecs.components.CameraComponent
 import com.github.dwursteisen.minigdx.ecs.components.Component
 import com.github.dwursteisen.minigdx.ecs.components.Position
 import com.github.dwursteisen.minigdx.ecs.components.SpriteComponent
-import com.github.dwursteisen.minigdx.ecs.components.gl.BoundingBox
 import com.github.dwursteisen.minigdx.ecs.entities.Entity
 import com.github.dwursteisen.minigdx.ecs.entities.EntityFactory
 import com.github.dwursteisen.minigdx.ecs.entities.position
@@ -22,6 +20,8 @@ import com.github.dwursteisen.minigdx.ecs.systems.StateMachineSystem
 import com.github.dwursteisen.minigdx.ecs.systems.System
 import com.github.dwursteisen.minigdx.file.get
 import com.github.dwursteisen.minigdx.game.Game
+import com.github.dwursteisen.minigdx.graph.GraphScene
+import com.github.dwursteisen.minigdx.graph.Sprite
 import com.github.dwursteisen.minigdx.input.Key
 import com.github.dwursteisen.minigdx.math.Interpolations
 import com.github.dwursteisen.minigdx.math.Vector3
@@ -40,7 +40,7 @@ class RootSystem : System(EntityQuery(Root::class)) {
     val platforms by interested(EntityQuery(Platform::class))
 
     override fun update(delta: Seconds, entity: Entity) {
-        val box = player.first().get(BoundingBox::class)
+        val box = player.first().get(BoundingBoxComponent::class)
         if (input.isKeyPressed(Key.ARROW_RIGHT)) {
             val closestHit = platformHit(
                 platforms,
@@ -48,7 +48,7 @@ class RootSystem : System(EntityQuery(Root::class)) {
                 Vector3.X
             )
             if (closestHit == null) {
-                entity.position.addWorldRotation(y = -90f, delta = delta)
+                entity.position.addGlobalRotation(y = -90f, delta = delta)
             }
         } else if (input.isKeyPressed(Key.ARROW_LEFT)) {
             val closestHit = platformHit(
@@ -57,13 +57,13 @@ class RootSystem : System(EntityQuery(Root::class)) {
                 Vector3.MINUS_X
             )
             if (closestHit == null) {
-                entity.position.addWorldRotation(y = 90f, delta = delta)
+                entity.position.addGlobalRotation(y = 90f, delta = delta)
             }
         }
     }
 }
 
-class CameraSystem : System(EntityQuery(Camera::class)) {
+class CameraSystem : System(EntityQuery(CameraComponent::class)) {
 
     val player by interested(EntityQuery(Player::class))
 
@@ -109,7 +109,7 @@ class PlayerSystem : StateMachineSystem(Player::class) {
                 return Jump(parent)
             }
             if (parent.move(entity)) {
-                val box = entity.get(BoundingBox::class)
+                val box = entity.get(BoundingBoxComponent::class)
                 val closestHit = platformHit(
                     parent.platforms,
                     Vector3(box.center.x, box.min.y, box.center.z),
@@ -140,7 +140,7 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             val position = entity.get(Position::class)
             if (velocity < 0f) {
                 entity.get(SpriteComponent::class).switchToAnimation("jump_down")
-                val box = entity.get(BoundingBox::class)
+                val box = entity.get(BoundingBoxComponent::class)
                 val closestHit = platformHit(
                     parent.platforms,
                     Vector3(box.center.x, box.min.y, box.center.z),
@@ -172,10 +172,10 @@ class PlayerSystem : StateMachineSystem(Player::class) {
     private fun move(entity: Entity): Boolean {
         val position = entity.position
         return if (input.isKeyPressed(Key.ARROW_LEFT)) {
-            position.setWorldRotation(Quaternion.fromEulers(0f, 1f, 0f, 180f))
+            position.setGlobalRotation(Quaternion.fromEulers(0f, 1f, 0f, 180f))
             true
         } else if (input.isKeyPressed(Key.ARROW_RIGHT)) {
-            position.setWorldRotation(Quaternion.fromEulers(0f, 1f, 0f, 0f))
+            position.setGlobalRotation(Quaternion.fromEulers(0f, 1f, 0f, 0f))
             true
         } else {
             false
@@ -195,7 +195,7 @@ object CollisionUtils {
         platforms: List<Entity>,
         startPoint: Vector3,
         direction: Vector3
-    ): Pair<BoundingBox, Vector3>? {
+    ): Pair<BoundingBoxComponent, Vector3>? {
         val map = platforms.mapNotNull { platform ->
 
             val intersectRayBounds = rayResolver.intersectRayBounds(
@@ -206,7 +206,7 @@ object CollisionUtils {
             if (intersectRayBounds == null) {
                 null
             } else {
-                platform.get(BoundingBox::class) to intersectRayBounds
+                platform.get(BoundingBoxComponent::class) to intersectRayBounds
             }
         }
         return map
@@ -219,22 +219,20 @@ object CollisionUtils {
 
 class PlatformerGame3D(override val gameContext: GameContext) : Game {
 
-    private val scene: Scene by gameContext.fileHandler.get("3d-platformer-tower.protobuf")
+    private val scene: GraphScene by gameContext.fileHandler.get("3d-platformer-tower.protobuf")
 
-    private val spr: Scene by gameContext.fileHandler.get("2d-platformer-spr.protobuf")
+    private val spr: Sprite by gameContext.fileHandler.get("2d-platformer-spr.protobuf")
 
     override fun createEntities(entityFactory: EntityFactory) {
         val root = entityFactory.create {
             add(Position())
             add(Root())
         }
-        scene.children.forEach {
+        scene.nodes.forEach {
 
             if (it.name == "player") {
-                val player = entityFactory.engine.createSprite(
-                    spr.sprites.values.first(),
-                    spr,
-                    it.transformation.toMat4()
+                val player = entityFactory.createSprite(
+                    spr, it.combinedTransformation
                 ).also { e ->
                     e.name = it.name
                 }
@@ -242,18 +240,14 @@ class PlatformerGame3D(override val gameContext: GameContext) : Game {
                 // bounding box
                 val box = entityFactory.createBox(it).attachTo(player)
                 player.add(Player())
-                player.add(box.get(BoundingBox::class))
+                player.add(box.get(BoundingBoxComponent::class))
                 box.destroy()
             } else if (it.name.startsWith("platform")) {
-                val platform = entityFactory.createFromNode(it, scene)
+                val platform = entityFactory.createFromNode(it)
                 platform.add(Platform())
-                val model = scene.models.get(it.reference)
-                model?.let {
-                    platform.add(BoundingBox.from(model.mesh))
-                }
                 platform.attachTo(root)
             } else {
-                val e = entityFactory.createFromNode(it, scene)
+                val e = entityFactory.createFromNode(it)
                 if (it.type == ObjectType.MODEL) {
                     e.attachTo(root)
                 }

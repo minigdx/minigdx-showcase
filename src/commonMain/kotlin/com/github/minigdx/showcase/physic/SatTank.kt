@@ -4,9 +4,9 @@ import com.dwursteisen.minigdx.scene.api.Scene
 import com.github.dwursteisen.minigdx.GameContext
 import com.github.dwursteisen.minigdx.Seconds
 import com.github.dwursteisen.minigdx.ecs.Engine
+import com.github.dwursteisen.minigdx.ecs.components.BoundingBoxComponent
 import com.github.dwursteisen.minigdx.ecs.components.Component
 import com.github.dwursteisen.minigdx.ecs.components.ScriptComponent
-import com.github.dwursteisen.minigdx.ecs.components.gl.BoundingBox
 import com.github.dwursteisen.minigdx.ecs.entities.Entity
 import com.github.dwursteisen.minigdx.ecs.entities.EntityFactory
 import com.github.dwursteisen.minigdx.ecs.entities.position
@@ -16,6 +16,7 @@ import com.github.dwursteisen.minigdx.ecs.systems.EntityQuery
 import com.github.dwursteisen.minigdx.ecs.systems.System
 import com.github.dwursteisen.minigdx.file.get
 import com.github.dwursteisen.minigdx.game.Game
+import com.github.dwursteisen.minigdx.graph.GraphScene
 import com.github.dwursteisen.minigdx.input.Key
 import com.github.dwursteisen.minigdx.math.Interpolations
 import com.github.dwursteisen.minigdx.math.Vector3
@@ -58,8 +59,8 @@ class TankSystem : System(EntityQuery(Tank::class)) {
         // Copy the list as removing an entity might lead to a concurrent modification exception.
         energies.toMutableList().forEach { cube ->
             if (satCollisionResolver.collide(entity, cube)) {
-                cube.get(BoundingBox::class).touch = true
-                entity.get(BoundingBox::class).touch  = true
+                cube.get(BoundingBoxComponent::class).touch = true
+                entity.get(BoundingBoxComponent::class).touch  = true
                 cube.remove(Energie::class)
                 cube.add(ScriptComponent(
                     script = {
@@ -76,7 +77,7 @@ class TankSystem : System(EntityQuery(Tank::class)) {
         var duration = 1f
         while(duration > 0f) {
             duration -= delta
-            target.position.addWorldRotation(y = 180f, delta = delta)
+            target.position.addGlobalRotation(y = 180f, delta = delta)
             yield()
         }
         executeInGameLoop {
@@ -87,11 +88,11 @@ class TankSystem : System(EntityQuery(Tank::class)) {
 
 class SatTank(override val gameContext: GameContext) : Game {
 
-    private val scene by gameContext.fileHandler.get<Scene>("sat-collision.protobuf")
+    private val scene by gameContext.fileHandler.get<GraphScene>("sat-collision.protobuf")
 
     override fun createEntities(entityFactory: EntityFactory) {
-        scene.children.forEach {
-            val e = entityFactory.createFromNode(it, scene)
+        scene.nodes.forEach {
+            val e = entityFactory.createFromNode(it)
             if (it.name == "tank") {
                 e.add(Tank())
             }

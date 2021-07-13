@@ -1,24 +1,14 @@
 package com.github.minigdx.showcase.twod
 
-import com.curiouscreature.kotlin.math.Mat4
 import com.curiouscreature.kotlin.math.Quaternion.Companion.fromEulers
-import com.dwursteisen.minigdx.scene.api.Scene
-import com.dwursteisen.minigdx.scene.api.common.Id
-import com.dwursteisen.minigdx.scene.api.model.Normal
-import com.dwursteisen.minigdx.scene.api.model.Primitive
-import com.dwursteisen.minigdx.scene.api.model.UV
-import com.dwursteisen.minigdx.scene.api.model.Vertex
-import com.dwursteisen.minigdx.scene.api.sprite.Sprite
 import com.github.dwursteisen.minigdx.GameContext
 import com.github.dwursteisen.minigdx.Seconds
-import com.github.dwursteisen.minigdx.api.toMat4
 import com.github.dwursteisen.minigdx.ecs.Engine
+import com.github.dwursteisen.minigdx.ecs.components.BoundingBoxComponent
 import com.github.dwursteisen.minigdx.ecs.components.Component
 import com.github.dwursteisen.minigdx.ecs.components.Position
 import com.github.dwursteisen.minigdx.ecs.components.SpriteComponent
 import com.github.dwursteisen.minigdx.ecs.components.StateMachineComponent
-import com.github.dwursteisen.minigdx.ecs.components.gl.BoundingBox
-import com.github.dwursteisen.minigdx.ecs.components.gl.MeshPrimitive
 import com.github.dwursteisen.minigdx.ecs.entities.Entity
 import com.github.dwursteisen.minigdx.ecs.entities.EntityFactory
 import com.github.dwursteisen.minigdx.ecs.entities.position
@@ -30,6 +20,7 @@ import com.github.dwursteisen.minigdx.ecs.systems.StateMachineSystem
 import com.github.dwursteisen.minigdx.ecs.systems.System
 import com.github.dwursteisen.minigdx.file.get
 import com.github.dwursteisen.minigdx.game.Game
+import com.github.dwursteisen.minigdx.graph.GraphScene
 import com.github.dwursteisen.minigdx.input.Key
 import com.github.dwursteisen.minigdx.math.Vector3
 import kotlin.math.sqrt
@@ -62,6 +53,17 @@ class CoinSystem : System(EntityQuery(Coin::class)) {
     override fun update(delta: Seconds, entity: Entity) {
         entity.get(Position::class).addLocalRotation(y = 90f, delta = delta)
     }
+}
+
+class MouseSystem : System(EntityQuery.none()) {
+
+    override fun update(delta: Float) {
+        input.touchIdlePosition()?.run {
+
+        }
+    }
+
+    override fun update(delta: Seconds, entity: Entity) = Unit
 }
 
 class PlayerSystem : StateMachineSystem(Player::class) {
@@ -156,14 +158,14 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             if (position.translation.x - (5f * delta) > -6.5f) {
                 position.addGlobalTranslation(x = -5f, delta = delta)
             }
-            position.setWorldRotation(fromEulers(0f, 1f, 0f, 180f))
+            position.setGlobalRotation(fromEulers(0f, 1f, 0f, 180f))
             true
         } else if (input.isKeyPressed(Key.ARROW_RIGHT)) {
             // still in the screen limit
             if (position.translation.x + (5f * delta) < 6.5f) {
                 position.addGlobalTranslation(x = 5f, delta = delta)
             }
-            position.setWorldRotation(fromEulers(0f, 1f, 0f, 0f))
+            position.setGlobalRotation(fromEulers(0f, 1f, 0f, 0f))
             true
         } else {
             false
@@ -173,9 +175,9 @@ class PlayerSystem : StateMachineSystem(Player::class) {
     private fun platformHit(
         player: Entity,
         platforms: List<Entity>
-    ): Pair<BoundingBox, Vector3>? {
+    ): Pair<BoundingBoxComponent, Vector3>? {
         val base = player.getChild("base")
-        val box = base.get(BoundingBox::class)
+        val box = base.get(BoundingBoxComponent::class)
 
         val lowerLeft = Vector3(box.center.x, box.min.y, box.center.z)
 
@@ -189,7 +191,7 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             if (intersectRayBounds == null) {
                 null
             } else {
-                platform.get(BoundingBox::class) to intersectRayBounds
+                platform.get(BoundingBoxComponent::class) to intersectRayBounds
             }
         }
         return map
@@ -205,18 +207,13 @@ class PlayerSystem : StateMachineSystem(Player::class) {
 
 class PlatformerGame2D(override val gameContext: GameContext) : Game {
 
-    private val scene: Scene by gameContext.fileHandler.get("2d-platformer.protobuf")
-    private val spr: Scene by gameContext.fileHandler.get("2d-platformer-spr.protobuf")
+    private val scene: GraphScene by gameContext.fileHandler.get("2d-platformer.protobuf")
+    private val spr: com.github.dwursteisen.minigdx.graph.Sprite by gameContext.fileHandler.get("2d-platformer-spr.protobuf")
 
     override fun createEntities(entityFactory: EntityFactory) {
-        scene.children.forEach {
-
+        scene.nodes.forEach {
             if (it.name == "player") {
-                val player = entityFactory.engine.createSprite(
-                    spr.sprites.values.first(),
-                    spr,
-                    it.transformation.toMat4()
-                ).also { e ->
+                val player = entityFactory.createSprite(spr, it.combinedTransformation).also { e ->
                     e.name = it.name
                 }
 
@@ -229,81 +226,22 @@ class PlatformerGame2D(override val gameContext: GameContext) : Game {
                 val hitbox = entityFactory.createBox(it)
                 hitbox.add(CoinHixBox())
 
-                val sprite = entityFactory.engine.createSprite(
-                    spr.sprites.values.first(),
-                    spr,
-                    it.children.first().transformation.toMat4()
-                )
-                    .also { e ->
-                        e.name = it.name
-
-                    }
+                val sprite = entityFactory.createSprite(spr, it.children.first().combinedTransformation).also { e ->
+                    e.name = it.name
+                }
                 sprite.get(SpriteComponent::class).switchToAnimation("coin")
                 sprite.add(Coin())
                 sprite.attachTo(hitbox)
             } else if (it.name.startsWith("platform")) {
-                val platform = entityFactory.createFromNode(it, scene)
+                val platform = entityFactory.createFromNode(it)
                 platform.add(Platform())
             } else {
-                entityFactory.createFromNode(it, scene)
+                entityFactory.createFromNode(it)
             }
         }
     }
 
     override fun createSystems(engine: Engine): List<System> {
-        return listOf(CoinHitBoxSystem(), CoinSystem(), PlayerSystem())
+        return listOf(CoinHitBoxSystem(), CoinSystem(), PlayerSystem(), MouseSystem())
     }
-}
-
-// TODO: put that in the EntityFactory
-fun Engine.createSprite(sprite: Sprite, scene: Scene, transformation: Mat4): Entity = create {
-    add(Position(transformation, transformation, transformation))
-    add(
-        SpriteComponent(
-            animations = sprite.animations,
-            uvs = sprite.uvs
-        )
-    )
-    add(
-        MeshPrimitive(
-            id = Id(),
-            name = "undefined",
-            material = scene.materials.getValue(sprite.materialReference),
-            hasAlpha = scene.materials.getValue(sprite.materialReference).hasAlpha,
-            primitive = Primitive(
-                id = Id(),
-                materialId = sprite.materialReference,
-                vertices = listOf(
-                    Vertex(
-                        com.dwursteisen.minigdx.scene.api.model.Position(-1f, -1f, 0f),
-                        Normal(0f, 0f, 0f),
-                        uv = UV(0f, 0f)
-                    ),
-                    Vertex(
-                        com.dwursteisen.minigdx.scene.api.model.Position(1f, -1f, 0f),
-                        Normal(0f, 0f, 0f),
-                        uv = UV(0f, 0f)
-                    ),
-                    Vertex(
-                        com.dwursteisen.minigdx.scene.api.model.Position(-1f, 1f, 0f),
-                        Normal(0f, 0f, 0f),
-                        uv = UV(0f, 0f)
-                    ),
-                    Vertex(
-                        com.dwursteisen.minigdx.scene.api.model.Position(1f, 1f, 0f),
-                        Normal(0f, 0f, 0f),
-                        uv = UV(0f, 0f)
-                    )
-                ),
-                verticesOrder = intArrayOf(
-                    0,
-                    1,
-                    2,
-                    2,
-                    1,
-                    3
-                )
-            )
-        )
-    )
 }

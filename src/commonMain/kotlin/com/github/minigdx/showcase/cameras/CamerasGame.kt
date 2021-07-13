@@ -1,11 +1,10 @@
 package com.github.minigdx.showcase.cameras
 
-import com.dwursteisen.minigdx.scene.api.Scene
 import com.dwursteisen.minigdx.scene.api.relation.ObjectType
 import com.github.dwursteisen.minigdx.GameContext
 import com.github.dwursteisen.minigdx.Seconds
 import com.github.dwursteisen.minigdx.ecs.Engine
-import com.github.dwursteisen.minigdx.ecs.components.Camera
+import com.github.dwursteisen.minigdx.ecs.components.CameraComponent
 import com.github.dwursteisen.minigdx.ecs.components.Component
 import com.github.dwursteisen.minigdx.ecs.entities.Entity
 import com.github.dwursteisen.minigdx.ecs.entities.EntityFactory
@@ -14,13 +13,14 @@ import com.github.dwursteisen.minigdx.ecs.systems.EntityQuery
 import com.github.dwursteisen.minigdx.ecs.systems.System
 import com.github.dwursteisen.minigdx.file.get
 import com.github.dwursteisen.minigdx.game.Game
+import com.github.dwursteisen.minigdx.graph.GraphScene
 import com.github.dwursteisen.minigdx.input.Key
 import com.github.dwursteisen.minigdx.math.Interpolations
 import kotlin.math.min
 
-class CameraSpot(val camera: Camera) : Component
+class CameraSpot(val camera: CameraComponent) : Component
 
-class CamerasSystem : System(EntityQuery.Companion.of(Camera::class)) {
+class CamerasSystem : System(EntityQuery.Companion.of(CameraComponent::class)) {
 
     private val camerasSpot by interested(EntityQuery.Companion.of(CameraSpot::class))
 
@@ -34,7 +34,7 @@ class CamerasSystem : System(EntityQuery.Companion.of(Camera::class)) {
     }
 
     override fun update(delta: Seconds, entity: Entity) {
-        val camera = entity.get(Camera::class)
+        val camera = entity.get(CameraComponent::class)
 
         // Interpolation of the camera's transform (ie: position)
         val transformation = Interpolations.interpolate(
@@ -64,21 +64,21 @@ class CamerasSystem : System(EntityQuery.Companion.of(Camera::class)) {
 
 class CamerasGame(override val gameContext: GameContext) : Game {
 
-    private val scene: Scene by gameContext.fileHandler.get("cameras.protobuf")
+    private val scene: GraphScene by gameContext.fileHandler.get("cameras.protobuf")
 
     override fun createEntities(entityFactory: EntityFactory) {
-        scene.children.forEach { node ->
-            val entity = entityFactory.createFromNode(node, scene)
+        scene.nodes.forEach { node ->
+            val entity = entityFactory.createFromNode(node)
 
             if (node.type == ObjectType.CAMERA) {
-                val camera = entity.get(Camera::class)
+                val camera = entity.get(CameraComponent::class)
                 entity.remove(camera)
                 entity.add(CameraSpot(camera))
             }
         }
 
-        scene.children.first { it.type == ObjectType.CAMERA }
-            .let { entityFactory.createFromNode(it, scene) }
+        scene.nodes.first { it.type == ObjectType.CAMERA }
+            .let { entityFactory.createFromNode(it) }
     }
 
     override fun createSystems(engine: Engine): List<System> {
