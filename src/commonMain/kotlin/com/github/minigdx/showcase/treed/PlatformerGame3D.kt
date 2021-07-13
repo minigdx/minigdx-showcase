@@ -28,7 +28,6 @@ import com.github.dwursteisen.minigdx.math.Vector3
 import com.github.minigdx.showcase.treed.CollisionUtils.platformHit
 import com.github.minigdx.showcase.twod.Platform
 import com.github.minigdx.showcase.twod.Player
-import com.github.minigdx.showcase.twod.createSprite
 import kotlin.math.sqrt
 
 class Root : Component
@@ -48,7 +47,7 @@ class RootSystem : System(EntityQuery(Root::class)) {
                 Vector3.X
             )
             if (closestHit == null) {
-                entity.position.addGlobalRotation(y = -90f, delta = delta)
+                entity.position.addLocalRotation(y = -90f, delta = delta)
             }
         } else if (input.isKeyPressed(Key.ARROW_LEFT)) {
             val closestHit = platformHit(
@@ -57,7 +56,7 @@ class RootSystem : System(EntityQuery(Root::class)) {
                 Vector3.MINUS_X
             )
             if (closestHit == null) {
-                entity.position.addGlobalRotation(y = 90f, delta = delta)
+                entity.position.addLocalRotation(y = 90f, delta = delta)
             }
         }
     }
@@ -172,10 +171,10 @@ class PlayerSystem : StateMachineSystem(Player::class) {
     private fun move(entity: Entity): Boolean {
         val position = entity.position
         return if (input.isKeyPressed(Key.ARROW_LEFT)) {
-            position.setGlobalRotation(Quaternion.fromEulers(0f, 1f, 0f, 180f))
+            position.setLocalRotation(Quaternion.fromEulers(0f, 1f, 0f, 180f))
             true
         } else if (input.isKeyPressed(Key.ARROW_RIGHT)) {
-            position.setGlobalRotation(Quaternion.fromEulers(0f, 1f, 0f, 0f))
+            position.setLocalRotation(Quaternion.fromEulers(0f, 1f, 0f, 0f))
             true
         } else {
             false

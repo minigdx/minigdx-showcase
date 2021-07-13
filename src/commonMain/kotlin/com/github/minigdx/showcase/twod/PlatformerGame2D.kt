@@ -158,14 +158,14 @@ class PlayerSystem : StateMachineSystem(Player::class) {
             if (position.translation.x - (5f * delta) > -6.5f) {
                 position.addGlobalTranslation(x = -5f, delta = delta)
             }
-            position.setGlobalRotation(fromEulers(0f, 1f, 0f, 180f))
+            position.setLocalRotation(fromEulers(0f, 1f, 0f, 180f))
             true
         } else if (input.isKeyPressed(Key.ARROW_RIGHT)) {
             // still in the screen limit
             if (position.translation.x + (5f * delta) < 6.5f) {
                 position.addGlobalTranslation(x = 5f, delta = delta)
             }
-            position.setGlobalRotation(fromEulers(0f, 1f, 0f, 0f))
+            position.setLocalRotation(fromEulers(0f, 1f, 0f, 0f))
             true
         } else {
             false
