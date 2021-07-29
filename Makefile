@@ -1,4 +1,4 @@
-run:
+run: assemble
 	jekyll serve
 
 assemble:

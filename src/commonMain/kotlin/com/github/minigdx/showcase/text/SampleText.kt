@@ -1,6 +1,5 @@
 package com.github.minigdx.showcase.text
 
-import com.dwursteisen.minigdx.scene.api.Scene
 import com.github.dwursteisen.minigdx.GameContext
 import com.github.dwursteisen.minigdx.Seconds
 import com.github.dwursteisen.minigdx.ecs.Engine
@@ -17,6 +16,7 @@ import com.github.dwursteisen.minigdx.ecs.systems.System
 import com.github.dwursteisen.minigdx.file.Font
 import com.github.dwursteisen.minigdx.file.get
 import com.github.dwursteisen.minigdx.game.Game
+import com.github.dwursteisen.minigdx.graph.GraphScene
 import com.github.dwursteisen.minigdx.input.Key
 import com.github.dwursteisen.minigdx.input.TouchSignal
 import kotlin.math.sin
@@ -42,16 +42,16 @@ class HorizontalAlignmentSystem : System(EntityQuery.of(TextComponent::class)) {
 
 class SampleText(override val gameContext: GameContext) : Game {
 
-    private val scene: Scene by gameContext.fileHandler.get("sampleText.protobuf")
+    private val scene: GraphScene by gameContext.fileHandler.get("sampleText.protobuf")
 
     private val font: Font by gameContext.fileHandler.get("pt_font")
 
     override fun createEntities(entityFactory: EntityFactory) {
-        scene.children.forEach { node ->
 
+        scene.nodes.forEach { node ->
             if (node.name == "wave") {
-                val textEffect = WaveEffect(WriteText("This is a wave effect"), 0.05f, 10)
-                entityFactory.createText(textEffect, font, node, scene)
+                val textEffect = WaveEffect(WriteText(" 1234567890"), 0.05f, 10)
+                entityFactory.createText(textEffect, font, node)
                     .also {
                         val textComponent = it.get(TextComponent::class)
                         textComponent.lineWith = 30
@@ -59,14 +59,14 @@ class SampleText(override val gameContext: GameContext) : Game {
                     }
             } else if (node.name == "typewriter") {
                 val textEffect = TypeWriterEffect(WriteText("This is a type writer effect   "), 0.05f, loop = true)
-                entityFactory.createText(textEffect, font, node, scene)
+                entityFactory.createText(textEffect, font, node)
                     .also {
                         val textComponent = it.get(TextComponent::class)
                         textComponent.lineWith = 30
                         textComponent.horizontalAlign = HorizontalAlignment.Center
                     }
             } else {
-                entityFactory.createFromNode(node, scene)
+                entityFactory.createFromNode(node)
             }
 
         }

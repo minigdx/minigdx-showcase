@@ -5,7 +5,9 @@ import com.github.dwursteisen.minigdx.GameConfiguration
 import com.github.dwursteisen.minigdx.GameScreenConfiguration
 import com.github.minigdx.showcase.cameras.CamerasGame
 import com.github.minigdx.showcase.dance.DanceGame
+import com.github.minigdx.showcase.imguilight.ImGUILight
 import com.github.minigdx.showcase.physic.SatTank
+import com.github.minigdx.showcase.shader.GhostShader
 import com.github.minigdx.showcase.text.SampleText
 import com.github.minigdx.showcase.treed.PlatformerGame3D
 import com.github.minigdx.showcase.twod.PlatformerGame2D
@@ -40,6 +42,8 @@ fun main() {
                 "tank" -> SatTank(it)
                 "cameras" -> CamerasGame(it)
                 "sampleText" -> SampleText(it)
+                "ghostShader" -> GhostShader(it)
+                "imgguilight" -> ImGUILight(it)
                 else -> TODO("$gameName seems to be an invalid game name. check again.")
             }
         }
