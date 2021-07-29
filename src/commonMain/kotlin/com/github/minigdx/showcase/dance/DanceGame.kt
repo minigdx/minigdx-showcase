@@ -1,6 +1,5 @@
 package com.github.minigdx.showcase.dance
 
-import com.dwursteisen.minigdx.scene.api.Scene
 import com.dwursteisen.minigdx.scene.api.relation.ObjectType
 import com.github.dwursteisen.minigdx.GameContext
 import com.github.dwursteisen.minigdx.Seconds
@@ -13,6 +12,7 @@ import com.github.dwursteisen.minigdx.ecs.systems.EntityQuery
 import com.github.dwursteisen.minigdx.ecs.systems.System
 import com.github.dwursteisen.minigdx.file.get
 import com.github.dwursteisen.minigdx.game.Game
+import com.github.dwursteisen.minigdx.graph.GraphScene
 import com.github.dwursteisen.minigdx.input.Key
 
 class Armature : Component
@@ -30,11 +30,11 @@ class TurnSystem : System(EntityQuery(Armature::class)) {
 
 class DanceGame(override val gameContext: GameContext) : Game {
 
-    private val scene: Scene by gameContext.fileHandler.get("dance.protobuf")
+    private val scene: GraphScene by gameContext.fileHandler.get("dance.protobuf")
 
     override fun createEntities(entityFactory: EntityFactory) {
-        scene.children.forEach {
-            val e = entityFactory.createFromNode(it, scene)
+        scene.nodes.forEach {
+            val e = entityFactory.createFromNode(it)
             if (it.type == ObjectType.LIGHT) {
                 e.position.setGlobalTranslation(1.4f, 1.75f, 2.8f)
             } else if (it.type == ObjectType.ARMATURE) {
