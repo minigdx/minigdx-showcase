@@ -2,8 +2,8 @@ run: assemble
 	jekyll serve
 
 assemble:
-	./gradlew bundle-js
-	cp -r build/distributions js/
+	./gradlew bundleJs
+	cp -r web/build/distributions js/
 
 deploy: assemble
 	jekyll build
