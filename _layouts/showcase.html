@@ -9,10 +9,10 @@ layout: default
     </header>
 
     <article class="post-content">
-        <canvas property="{{page.game}}" width="800" height="450"></canvas>
+        <canvas width="800" height="450"></canvas>
         {{ content }}
     </article>
 
 </div>
-<script src="{{ site.baseurl }}/js/distributions/minigdx-showcase.js"></script>
+<script src="{{ site.baseurl }}/js/distributions/{{page.game}}.js"></script>
 

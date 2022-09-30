@@ -2,7 +2,7 @@
 layout: showcase
 title: Text animation
 description: Display text and animate it
-game: sampleText
+game: demo-text
 ---
 
 # Controls

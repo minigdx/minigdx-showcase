@@ -20,4 +20,11 @@ plugins {
 
 include("common")
 include("jvm")
-include("web")
+include("demo-camera")
+include("demo-dance")
+include("demo-imgui-light")
+include("demo-physic")
+include("demo-shader")
+include("demo-text")
+include("demo-threed")
+include("demo-twod")

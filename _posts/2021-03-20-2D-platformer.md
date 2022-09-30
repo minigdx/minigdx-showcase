@@ -2,7 +2,7 @@
 layout: showcase
 title: 2D Platformer
 description: Simple platformer in 2D
-game: 2d-platformer
+game: demo-twod
 ---
 
 # Controls
