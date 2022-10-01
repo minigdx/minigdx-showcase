@@ -28,6 +28,7 @@ object Showcase {
                 GameConfiguration(
                     gameName = "Showcase game",
                     debug = false,
+                    jointLimit = 100,
                     canvas = canvas as HTMLCanvasElement,
                     gameScreenConfiguration = GameScreenConfiguration.WithRatio(16f / 9f),
                     rootPath = root
