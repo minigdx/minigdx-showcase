@@ -22,13 +22,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Build examples and generate Asciidoctor HTML pages
+      - name: Build examples and generate showcases JS
         run: make assemble
       - name: Copy generated content into gh-pages.
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          publish_dir: ./static-site
 
 env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=true -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"

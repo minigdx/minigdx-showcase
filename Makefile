@@ -1,16 +1,16 @@
 run: assemble
-	jekyll serve
+	cd static-site ; jekyll serve
 
 assemble:
 	./gradlew bundleJs
-	cp -r demo-camera/build/distributions js/
-	cp -r demo-dance/build/distributions js/
-	cp -r demo-imgui-light/build/distributions js/
-	cp -r demo-physic/build/distributions js/
-	cp -r demo-shader/build/distributions js/
-	cp -r demo-text/build/distributions js/
-	cp -r demo-threed/build/distributions js/
-	cp -r demo-twod/build/distributions js/
+	cp -r demo-camera/build/distributions static-site/js/
+	cp -r demo-dance/build/distributions static-site/js/
+	cp -r demo-imgui-light/build/distributions static-site/js/
+	cp -r demo-physic/build/distributions static-site/js/
+	cp -r demo-shader/build/distributions static-site/js/
+	cp -r demo-text/build/distributions static-site/js/
+	cp -r demo-threed/build/distributions static-site/js/
+	cp -r demo-twod/build/distributions static-site/js/
 
 deploy: assemble
 	jekyll build
