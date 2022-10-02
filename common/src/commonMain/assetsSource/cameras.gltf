@@ -1,6 +1,6 @@
 {
     "asset" : {
-        "generator" : "Khronos glTF Blender I/O v1.5.17",
+        "generator" : "Khronos glTF Blender I/O v3.3.27",
         "version" : "2.0"
     },
     "extensionsUsed" : [
@@ -31,14 +31,14 @@
             "name" : "Scene",
             "nodes" : [
                 0,
+                1,
                 2,
+                3,
                 4,
                 5,
                 6,
                 7,
-                8,
-                10,
-                12
+                8
             ]
         }
     ],
@@ -58,24 +58,12 @@
                     "light" : 0
                 }
             },
-            "name" : "Light_Orientation",
-            "rotation" : [
-                -0.7071067690849304,
-                0,
-                0,
-                0.7071067690849304
-            ]
-        },
-        {
-            "children" : [
-                1
-            ],
             "name" : "Light",
             "rotation" : [
-                0.16907575726509094,
-                0.7558803558349609,
-                -0.27217137813568115,
-                0.570947527885437
+                -0.2841663062572479,
+                0.7269423604011536,
+                0.34203392267227173,
+                0.5232754349708557
             ],
             "translation" : [
                 0,
@@ -85,24 +73,12 @@
         },
         {
             "camera" : 0,
-            "name" : "Camera_Orientation",
-            "rotation" : [
-                -0.7071067690849304,
-                0,
-                0,
-                0.7071067690849304
-            ]
-        },
-        {
-            "children" : [
-                3
-            ],
             "name" : "Camera",
             "rotation" : [
-                0.595904529094696,
-                0.12096821516752243,
-                -0.09140805155038834,
-                0.7886122465133667
+                -0.1362648606300354,
+                0.15017268061637878,
+                0.02090218849480152,
+                0.9790011048316956
             ],
             "translation" : [
                 3.347818374633789,
@@ -115,9 +91,9 @@
             "name" : "Cube.001",
             "rotation" : [
                 0,
-                0.2588190734386444,
+                0.258819043636322,
                 0,
-                0.965925931930542
+                0.9659258127212524
             ],
             "translation" : [
                 -2.5999999046325684,
@@ -153,10 +129,10 @@
             "mesh" : 4,
             "name" : "Torus",
             "rotation" : [
-                0.42162927985191345,
-                -0.9027779698371887,
-                -0.058505844324827194,
-                -0.061625875532627106
+                -0.42162930965423584,
+                0.9027779698371887,
+                0.058505844324827194,
+                0.061625879257917404
             ],
             "translation" : [
                 3,
@@ -166,24 +142,12 @@
         },
         {
             "camera" : 1,
-            "name" : "Camera.001_Orientation",
-            "rotation" : [
-                -0.7071067690849304,
-                0,
-                0,
-                0.7071067690849304
-            ]
-        },
-        {
-            "children" : [
-                9
-            ],
             "name" : "Camera.001",
             "rotation" : [
-                0.7515352964401245,
-                -0.06999357789754868,
-                0.07220130413770676,
-                0.6519835591316223
+                0.07039374858140945,
+                -0.10054696351289749,
+                0.0015610996633768082,
+                0.9924377202987671
             ],
             "translation" : [
                 -1.5819330215454102,
@@ -193,24 +157,12 @@
         },
         {
             "camera" : 2,
-            "name" : "Camera.002_Orientation",
-            "rotation" : [
-                -0.7071067690849304,
-                0,
-                0,
-                0.7071067690849304
-            ]
-        },
-        {
-            "children" : [
-                11
-            ],
             "name" : "Camera.002",
             "rotation" : [
-                -0.560248851776123,
-                0.39486685395240784,
-                -0.33361050486564636,
-                -0.6472290754318237
+                -0.061504289507865906,
+                -0.5151112675666809,
+                -0.04331476613879204,
+                0.8538158535957336
             ],
             "translation" : [
                 -18.37969970703125,
@@ -525,22 +477,26 @@
         {
             "buffer" : 0,
             "byteLength" : 288,
-            "byteOffset" : 0
+            "byteOffset" : 0,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 288,
-            "byteOffset" : 288
+            "byteOffset" : 288,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 192,
-            "byteOffset" : 576
+            "byteOffset" : 576,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 72,
-            "byteOffset" : 768
+            "byteOffset" : 768,
+            "target" : 34963
         },
         {
             "buffer" : 0,
@@ -550,82 +506,98 @@
         {
             "buffer" : 0,
             "byteLength" : 288,
-            "byteOffset" : 1052
+            "byteOffset" : 1052,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 288,
-            "byteOffset" : 1340
+            "byteOffset" : 1340,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 192,
-            "byteOffset" : 1628
+            "byteOffset" : 1628,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 72,
-            "byteOffset" : 1820
+            "byteOffset" : 1820,
+            "target" : 34963
         },
         {
             "buffer" : 0,
             "byteLength" : 2880,
-            "byteOffset" : 1892
+            "byteOffset" : 1892,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 2880,
-            "byteOffset" : 4772
+            "byteOffset" : 4772,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 1920,
-            "byteOffset" : 7652
+            "byteOffset" : 7652,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 480,
-            "byteOffset" : 9572
+            "byteOffset" : 9572,
+            "target" : 34963
         },
         {
             "buffer" : 0,
             "byteLength" : 23592,
-            "byteOffset" : 10052
+            "byteOffset" : 10052,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 23592,
-            "byteOffset" : 33644
+            "byteOffset" : 33644,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 15728,
-            "byteOffset" : 57236
+            "byteOffset" : 57236,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 5808,
-            "byteOffset" : 72964
+            "byteOffset" : 72964,
+            "target" : 34963
         },
         {
             "buffer" : 0,
             "byteLength" : 27648,
-            "byteOffset" : 78772
+            "byteOffset" : 78772,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 27648,
-            "byteOffset" : 106420
+            "byteOffset" : 106420,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 18432,
-            "byteOffset" : 134068
+            "byteOffset" : 134068,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 6912,
-            "byteOffset" : 152500
+            "byteOffset" : 152500,
+            "target" : 34963
         }
     ],
     "samplers" : [

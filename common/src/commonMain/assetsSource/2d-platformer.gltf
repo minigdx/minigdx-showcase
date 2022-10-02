@@ -1,6 +1,6 @@
 {
     "asset" : {
-        "generator" : "Khronos glTF Blender I/O v1.5.17",
+        "generator" : "Khronos glTF Blender I/O v3.3.27",
         "version" : "2.0"
     },
     "scene" : 0,
@@ -9,14 +9,14 @@
             "name" : "Scene",
             "nodes" : [
                 0,
-                2,
-                3,
+                1,
+                4,
                 6,
+                7,
                 8,
                 9,
                 10,
                 11,
-                12,
                 13,
                 15,
                 17,
@@ -24,47 +24,14 @@
                 21,
                 23,
                 25,
-                27,
-                28
+                26
             ]
         }
     ],
     "nodes" : [
         {
-            "name" : "Light",
-            "rotation" : [
-                0.16907575726509094,
-                0.7558803558349609,
-                -0.27217137813568115,
-                0.570947527885437
-            ],
-            "translation" : [
-                4.076245307922363,
-                5.903861999511719,
-                -1.0054539442062378
-            ]
-        },
-        {
             "camera" : 0,
-            "name" : "Camera_Orientation",
-            "rotation" : [
-                -0.7071067690849304,
-                0,
-                0,
-                0.7071067690849304
-            ]
-        },
-        {
-            "children" : [
-                1
-            ],
             "name" : "Camera",
-            "rotation" : [
-                0.7071068286895752,
-                0,
-                0,
-                0.7071068286895752
-            ],
             "translation" : [
                 0,
                 0,
@@ -93,14 +60,20 @@
         },
         {
             "name" : "base",
+            "rotation" : [
+                0,
+                1,
+                0,
+                0
+            ],
             "scale" : [
-                -0.22150275111198425,
+                0.22150275111198425,
                 0.13744059205055237,
-                -1.1140484809875488
+                1.1140484809875488
             ],
             "translation" : [
                 0,
-                -0.856829822063446,
+                -0.8568296432495117,
                 0
             ]
         },
@@ -120,8 +93,8 @@
         },
         {
             "children" : [
-                4,
-                5
+                2,
+                3
             ],
             "name" : "player",
             "scale" : [
@@ -145,7 +118,7 @@
         },
         {
             "children" : [
-                7
+                5
             ],
             "name" : "coin",
             "scale" : [
@@ -234,7 +207,7 @@
         },
         {
             "children" : [
-                14
+                12
             ],
             "name" : "coin.002",
             "scale" : [
@@ -258,7 +231,7 @@
         },
         {
             "children" : [
-                16
+                14
             ],
             "name" : "coin.001",
             "scale" : [
@@ -282,7 +255,7 @@
         },
         {
             "children" : [
-                18
+                16
             ],
             "name" : "coin.003",
             "scale" : [
@@ -306,7 +279,7 @@
         },
         {
             "children" : [
-                20
+                18
             ],
             "name" : "coin.004",
             "scale" : [
@@ -330,7 +303,7 @@
         },
         {
             "children" : [
-                22
+                20
             ],
             "name" : "coin.005",
             "scale" : [
@@ -354,7 +327,7 @@
         },
         {
             "children" : [
-                24
+                22
             ],
             "name" : "coin.006",
             "scale" : [
@@ -378,7 +351,7 @@
         },
         {
             "children" : [
-                26
+                24
             ],
             "name" : "coin.007",
             "scale" : [
@@ -500,22 +473,26 @@
         {
             "buffer" : 0,
             "byteLength" : 6144,
-            "byteOffset" : 0
+            "byteOffset" : 0,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 6144,
-            "byteOffset" : 6144
+            "byteOffset" : 6144,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 4096,
-            "byteOffset" : 12288
+            "byteOffset" : 12288,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 1536,
-            "byteOffset" : 16384
+            "byteOffset" : 16384,
+            "target" : 34963
         },
         {
             "buffer" : 0,
