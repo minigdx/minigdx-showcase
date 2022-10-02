@@ -33,6 +33,12 @@ class NopeSystem : System() {
                 }
                 checkbox("Counter above 5", counter > 5)
             }
+
+            container("Another container") {
+                label("you can add labels with information:")
+                label("Counter value: $counter")
+            }
+
         }
     }
 }
