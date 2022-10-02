@@ -3,5 +3,5 @@ plugins {
 }
 
 minigdx {
-    version.set("DEV-SNAPSHOT")
+    version.set(libs.versions.minigdx.get())
 }
