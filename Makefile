@@ -13,4 +13,4 @@ assemble:
 	cp -r demo-twod/build/distributions static-site/js/
 
 deploy: assemble
-	jekyll build
+	cd static-site ; jekyll build
