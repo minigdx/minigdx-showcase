@@ -15,7 +15,7 @@ pluginManagement {
 }
 
 plugins {
-    id("com.github.minigdx.settings") version ("LATEST-SNAPSHOT")
+    id("com.github.minigdx.settings") version ("DEV-SNAPSHOT")
 }
 
 include("common")
