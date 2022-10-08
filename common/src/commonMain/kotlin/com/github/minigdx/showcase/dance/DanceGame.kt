@@ -30,7 +30,7 @@ class TurnSystem : System(EntityQuery(Armature::class)) {
 
 class DanceGame(override val gameContext: GameContext) : Game {
 
-    private val scene: GraphScene by gameContext.fileHandler.get("dance.protobuf")
+    private val scene: GraphScene by gameContext.fileHandler.get("dance-external.protobuf")
 
     override fun createEntities(entityFactory: EntityFactory) {
         scene.nodes.forEach {
