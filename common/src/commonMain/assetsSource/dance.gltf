@@ -6,29 +6,11 @@
     "extensionsUsed" : [
         "KHR_materials_specular",
         "KHR_materials_ior",
-        "KHR_texture_transform",
-        "KHR_lights_punctual"
+        "KHR_texture_transform"
     ],
     "extensionsRequired" : [
-        "KHR_texture_transform",
-        "KHR_lights_punctual"
+        "KHR_texture_transform"
     ],
-    "extensions" : {
-        "KHR_lights_punctual" : {
-            "lights" : [
-                {
-                    "color" : [
-                        1,
-                        1,
-                        1
-                    ],
-                    "intensity" : 10,
-                    "type" : "point",
-                    "name" : "Point"
-                }
-            ]
-        }
-    },
     "scene" : 0,
     "scenes" : [
         {
@@ -36,8 +18,7 @@
             "nodes" : [
                 0,
                 1,
-                78,
-                79
+                78
             ]
         }
     ],
@@ -1582,25 +1563,6 @@
                 0.009999999776482582,
                 0.009999999776482582,
                 0.009999999776482582
-            ]
-        },
-        {
-            "extensions" : {
-                "KHR_lights_punctual" : {
-                    "light" : 0
-                }
-            },
-            "name" : "Point",
-            "rotation" : [
-                -0.7071068286895752,
-                0,
-                0,
-                0.7071068286895752
-            ],
-            "translation" : [
-                0,
-                1.4469326734542847,
-                0.5460654497146606
             ]
         }
     ],

@@ -11,6 +11,7 @@ assemble:
 	cp -r demo-text/build/distributions static-site/js/
 	cp -r demo-threed/build/distributions static-site/js/
 	cp -r demo-twod/build/distributions static-site/js/
+	cp -r demo-light/build/distributions static-site/js/
 
 deploy: assemble
 	cd static-site ; jekyll build
