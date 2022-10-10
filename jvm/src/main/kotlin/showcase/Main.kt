@@ -7,6 +7,7 @@ import com.github.dwursteisen.minigdx.Window
 import com.github.minigdx.showcase.Particles
 import com.github.minigdx.showcase.dance.DanceGame
 import com.github.minigdx.showcase.imguilight.ImGUILight
+import com.github.minigdx.showcase.light.LightGame
 import com.github.minigdx.showcase.physic.SatTank
 import com.github.minigdx.showcase.text.DebugText
 
@@ -18,7 +19,7 @@ class Main {
         fun main(vararg args: String) {
             GameApplicationBuilder(
                 gameFactory = {
-                    DanceGame(it)
+                    LightGame(it)
                 },
                 gameConfigurationFactory = {
                     GameConfiguration(
