@@ -11,6 +11,21 @@ pluginManagement {
             includeVersionByRegex("com.github.minigdx", "(.*)", "LATEST-SNAPSHOT")
         }
         mavenLocal()
-        jcenter()
     }
 }
+
+plugins {
+    id("com.github.minigdx.settings") version ("LATEST-SNAPSHOT")
+}
+
+include("common")
+include("jvm")
+include("demo-camera")
+include("demo-dance")
+include("demo-imgui-light")
+include("demo-physic")
+include("demo-shader")
+include("demo-text")
+include("demo-threed")
+include("demo-twod")
+include("demo-light")
